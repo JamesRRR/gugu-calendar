@@ -116,5 +116,14 @@ Page({
 
   onPickerCancel() {
     console.log('取消选择');
+  },
+
+  onShow() {
+    if (typeof this.getTabBar === 'function' &&
+        this.getTabBar()) {
+      this.getTabBar().setData({
+        selected: 0  // 设置创建页为选中状态
+      })
+    }
   }
 }); 

@@ -1,9 +1,10 @@
 Page({
   data: {
-    // Initial data properties
+    userInfo: null
   },
 
-  onLoad: function() {
-    // Page load logic
+  onShow() {
+    const userInfo = wx.getStorageSync('userInfo');
+    this.setData({ userInfo });
   }
-}) 
+}); 

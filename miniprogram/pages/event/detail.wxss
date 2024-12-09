@@ -80,11 +80,6 @@
   color: white;
 }
 
-.join-btn {
-  background-color: #07c160;
-  color: white;
-}
-
 .quit-btn {
   background-color: #ff4d4f;
   color: white;

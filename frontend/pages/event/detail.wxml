@@ -1,0 +1,66 @@
+<view class="container" wx:if="{{!loading}}">
+  <view class="event-header">
+    <text class="title">{{event.title}}</text>
+    <view class="creator-info">
+      <image class="avatar" src="{{event.creatorInfo.avatarUrl}}" mode="aspectFill"></image>
+      <text class="nickname">{{event.creatorInfo.nickName}}</text>
+    </view>
+  </view>
+
+  <view class="event-info">
+    <view class="info-item">
+      <text class="label">活动时间</text>
+      <text class="value">{{event.eventDate}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">活动描述</text>
+      <text class="value">{{event.description}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">参与人数</text>
+      <text class="value">{{event.participantCount}}人</text>
+    </view>
+  </view>
+
+  <view class="participants-section">
+    <text class="section-title">参与者</text>
+    <scroll-view class="participants-list" scroll-x="true">
+      <view class="participant" wx:for="{{event.participants}}" wx:key="openId">
+        <image class="avatar" src="{{item.avatarUrl}}" mode="aspectFill"></image>
+        <text class="nickname">{{item.nickName}}</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="action-buttons">
+    <button 
+      wx:if="{{!isParticipant && !isCreator}}" 
+      class="join-btn" 
+      type="primary" 
+      bindtap="handleJoinEvent"
+    >
+      参加活动
+    </button>
+    
+    <button 
+      wx:if="{{isParticipant && !isCreator}}" 
+      class="leave-btn" 
+      type="warn" 
+      bindtap="handleLeaveEvent"
+    >
+      退出活动
+    </button>
+
+    <button 
+      class="share-btn" 
+      type="primary" 
+      open-type="share"
+    >
+      分享活动
+    </button>
+  </view>
+</view>
+
+<view class="loading-container" wx:else>
+  <loading>加载中...</loading>
+</view> 

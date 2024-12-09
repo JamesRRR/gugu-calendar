@@ -2,15 +2,15 @@
   <view class="event-card">
     <view class="event-header">
       <text class="event-title">{{event.title}}</text>
-      <text class="event-status {{event.is_cancelled ? 'cancelled' : ''}}">
-        {{event.is_cancelled ? '已取消' : '进行中'}}
+      <text class="event-status {{event.isCancelled ? 'cancelled' : ''}}">
+        {{event.isCancelled ? '已取消' : '进行中'}}
       </text>
     </view>
 
     <view class="event-info">
       <view class="info-item">
         <text class="label">活动时间</text>
-        <text class="content">{{event.event_date}}</text>
+        <text class="content">{{event.eventDate}}</text>
       </view>
       
       <view class="info-item">
@@ -20,12 +20,17 @@
 
       <view class="info-item">
         <text class="label">参与人数</text>
-        <text class="content">{{event.participant_count}}人</text>
+        <text class="content">{{event.participantCount}}人</text>
+      </view>
+
+      <view class="info-item">
+        <text class="label">咕咕次数</text>
+        <text class="content">{{event.guguCount}}次</text>
       </view>
     </view>
 
     <view class="action-buttons">
-      <block wx:if="{{!event.is_cancelled}}">
+      <block wx:if="{{!event.isCancelled}}">
         <button 
           class="action-btn share-btn" 
           bindtap="shareEvent"
@@ -39,9 +44,10 @@
           咕咕
         </button>
         <button 
-          class="action-btn {{hasJoined ? 'quit-btn' : 'join-btn'}}" 
-          bindtap="toggleJoin">
-          {{hasJoined ? '退出活动' : '加入活动'}}
+          class="action-btn quit-btn" 
+          bindtap="quitEvent"
+          wx:if="{{!isCreator && hasJoined}}">
+          退出活动
         </button>
       </block>
       <text class="cancelled-text" wx:else>该活动已被取消</text>

@@ -1,0 +1,27 @@
+<view class="container">
+  <view class="search-box">
+    <input 
+      type="text" 
+      placeholder="搜索活动" 
+      bindinput="onSearch"
+      value="{{searchKeyword}}"
+    />
+  </view>
+
+  <view class="event-list">
+    <view class="event-item" wx:for="{{events}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}">
+      <text class="title">{{item.title}}</text>
+      <text class="description">{{item.description}}</text>
+      <text class="time">{{item.time}}</text>
+      <text class="location">{{item.location}}</text>
+      <text class="participants">参与人数：{{item.participants.length}}</text>
+    </view>
+  </view>
+
+  <view class="loading" wx:if="{{hasMore}}">
+    <text>加载中...</text>
+  </view>
+  <view class="no-more" wx:else>
+    <text>没有更多了</text>
+  </view>
+</view> 

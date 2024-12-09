@@ -1,3 +1,6 @@
-<view class="profile-container">
-  <!-- Profile page content -->
+<view class="container">
+  <view class="user-info">
+    <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
+    <text class="nickname">{{userInfo.nickName}}</text>
+  </view>
 </view> 
