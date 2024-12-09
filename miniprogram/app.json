@@ -1,8 +1,7 @@
 {
   "pages": [
-    "pages/index/index",
+    "pages/create/index",
     "pages/profile/index",
-    "pages/event/create",
     "pages/event/detail",
     "pages/event/registered/registered"
   ],
@@ -15,7 +14,7 @@
   "tabBar": {
     "list": [
       {
-        "pagePath": "pages/index/index",
+        "pagePath": "pages/create/index",
         "text": "首页",
         "iconPath": "/assets/images/home.png",
         "selectedIconPath": "/assets/images/home-selected.png"

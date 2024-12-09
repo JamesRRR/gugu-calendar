@@ -18,10 +18,19 @@ App({
     wx.cloud.callFunction({
       name: 'login'
     }).then(res => {
-      this.globalData.userInfo = {
-        openid: res.result.openid
-      }
-    }).catch(console.error)
+      const userInfo = {
+        openId: res.result.openid,
+        // 其他用户信息...
+      };
+      this.globalData.userInfo = userInfo;
+      wx.setStorageSync('userInfo', userInfo);
+    }).catch(err => {
+      console.error('登录失败：', err);
+      wx.showToast({
+        title: '登录失败',
+        icon: 'none'
+      });
+    });
   },
   
   onShow: function() {
