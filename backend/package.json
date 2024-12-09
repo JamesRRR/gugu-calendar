@@ -1,0 +1,18 @@
+{
+  "name": "gugu-calendar-backend",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "pg": "^8.7.1",
+    "dotenv": "^10.0.0",
+    "cors": "^2.8.5"
+  },
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+} 
