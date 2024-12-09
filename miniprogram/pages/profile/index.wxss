@@ -1,20 +1,22 @@
 .profile-container {
+  min-height: 100vh;
+  background: #f6f6f6;
   padding: 20rpx;
 }
 
-.user-info {
+.user-info-section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 40rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40rpx 0;
-  background-color: #fff;
-  border-radius: 10rpx;
   margin-bottom: 20rpx;
 }
 
 .avatar {
-  width: 128rpx;
-  height: 128rpx;
+  width: 160rpx;
+  height: 160rpx;
   border-radius: 50%;
   margin-bottom: 20rpx;
 }
@@ -22,33 +24,67 @@
 .nickname {
   font-size: 32rpx;
   color: #333;
+  font-weight: bold;
 }
 
 .login-btn {
-  margin: 20rpx;
-  padding: 20rpx 40rpx;
-  background-color: #07c160;
+  background: #07c160;
   color: #fff;
-  border-radius: 10rpx;
+  padding: 20rpx 60rpx;
+  border-radius: 100rpx;
+  font-size: 28rpx;
 }
 
-.menu-list {
-  background-color: #fff;
-  border-radius: 10rpx;
-}
-
-.menu-item {
+.stats-section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
+  margin-bottom: 20rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 30rpx 20rpx;
-  border-bottom: 1rpx solid #eee;
 }
 
-.menu-item:last-child {
-  border-bottom: none;
+.stat-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #07c160;
+  margin-bottom: 8rpx;
 }
 
-.arrow {
+.stat-label {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.avatar-wrapper {
+  padding: 0;
+  width: 160rpx !important;
+  height: 160rpx !important;
+  border-radius: 50%;
+  margin-bottom: 20rpx;
+  background: none;
+}
+
+.avatar-wrapper::after {
+  border: none;
+}
+
+.nickname-input {
+  text-align: center;
+  font-size: 32rpx;
+  color: #333;
+  font-weight: bold;
+  padding: 10rpx 0;
+  margin: 0 40rpx;
+}
+
+.nickname-placeholder {
   color: #999;
+  font-size: 28rpx;
 } 

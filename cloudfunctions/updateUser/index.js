@@ -11,21 +11,39 @@ exports.main = async (event, context) => {
   const { userInfo } = event
   
   try {
-    const result = await db.collection('users').where({
+    // 检查用户是否已存在
+    const user = await db.collection('users').where({
       openId: wxContext.OPENID
-    }).update({
-      data: {
-        nickName: userInfo.nickName,
-        avatarUrl: userInfo.avatarUrl,
-        updatedAt: db.serverDate()
-      }
-    })
+    }).get()
+
+    if (user.data.length === 0) {
+      // 创建新用户
+      await db.collection('users').add({
+        data: {
+          openId: wxContext.OPENID,
+          nickName: userInfo.nickName,
+          avatarUrl: userInfo.avatarUrl,
+          createTime: db.serverDate()
+        }
+      })
+    } else {
+      // 更新现有用户
+      await db.collection('users').where({
+        openId: wxContext.OPENID
+      }).update({
+        data: {
+          nickName: userInfo.nickName,
+          avatarUrl: userInfo.avatarUrl,
+          updateTime: db.serverDate()
+        }
+      })
+    }
 
     return {
-      success: true,
-      data: result
+      success: true
     }
   } catch (err) {
+    console.error(err)
     return {
       success: false,
       message: err.message

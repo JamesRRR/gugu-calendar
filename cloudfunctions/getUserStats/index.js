@@ -5,44 +5,40 @@ cloud.init({
 })
 
 const db = cloud.database()
-const _ = db.command
 
 exports.main = async (event, context) => {
-  const wxContext = cloud.getWXContext()
+  const { userId } = event
   
   try {
-    const eventsCollection = db.collection('events')
-    
-    // 获取创建的活动数量
-    const createdEvents = await eventsCollection.where({
-      creatorId: wxContext.OPENID
-    }).count()
+    // 获取用户参与的所有活动
+    const events = await db.collection('events')
+      .where({
+        participants: userId
+      })
+      .get()
+      .then(res => res.data)
 
-    // 获取参与的活动数量
-    const joinedEvents = await eventsCollection.where({
-      participants: wxContext.OPENID
-    }).count()
-
-    // 获取咕咕的活动数量
-    const guguEvents = await eventsCollection.where({
-      guguUsers: wxContext.OPENID
-    }).count()
-
-    // 计算咕咕率
-    const guguRate = joinedEvents.total > 0 
-      ? Math.round((guguEvents.total / joinedEvents.total) * 100) 
-      : 0
+    // 统计数据
+    const stats = events.reduce((acc, event) => {
+      acc.totalEvents++
+      if (event.status === 'gugu') {
+        acc.totalGuguCount++
+      } else if (event.status === 'completed') {
+        acc.completedEvents++
+      }
+      return acc
+    }, {
+      totalEvents: 0,
+      totalGuguCount: 0,
+      completedEvents: 0
+    })
 
     return {
       success: true,
-      data: {
-        createdCount: createdEvents.total,
-        joinedCount: joinedEvents.total,
-        guguCount: guguEvents.total,
-        guguRate: `${guguRate}%`
-      }
+      stats
     }
   } catch (err) {
+    console.error(err)
     return {
       success: false,
       message: err.message

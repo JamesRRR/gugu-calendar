@@ -14,23 +14,11 @@ App({
       })
     }
 
-    // 获取用户信息
-    wx.cloud.callFunction({
-      name: 'login'
-    }).then(res => {
-      const userInfo = {
-        openId: res.result.openid,
-        // 其他用户信息...
-      };
-      this.globalData.userInfo = userInfo;
-      wx.setStorageSync('userInfo', userInfo);
-    }).catch(err => {
-      console.error('登录失败：', err);
-      wx.showToast({
-        title: '登录失败',
-        icon: 'none'
-      });
-    });
+    // 尝试从本地存储获取用户信息
+    const userInfo = wx.getStorageSync('userInfo')
+    if (userInfo) {
+      this.globalData.userInfo = userInfo
+    }
   },
   
   onShow: function() {
