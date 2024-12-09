@@ -1,0 +1,33 @@
+<view class="container">
+  <block wx:if="{{!loading}}">
+    <block wx:if="{{events.length > 0}}">
+      <view class="event-list">
+        <view class="event-item" 
+              wx:for="{{events}}" 
+              wx:key="_id"
+              bindtap="goToEventDetail"
+              data-id="{{item._id}}">
+          <view class="event-title">{{item.title}}</view>
+          <view class="event-info">
+            <view class="info-item">
+              <text class="icon">🕒</text>
+              <text>{{item.formattedDate}}</text>
+            </view>
+            <view class="info-item">
+              <text class="icon">📍</text>
+              <text>{{item.location}}</text>
+            </view>
+            <view class="info-item">
+              <text class="icon">👥</text>
+              <text>{{item.participants.length}}{{item.maxParticipants ? '/' + item.maxParticipants : ''}} 人参加</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <view wx:else class="empty-tip">
+      <text class="icon">📝</text>
+      <text>还没有参加任何活动</text>
+    </view>
+  </block>
+</view> 

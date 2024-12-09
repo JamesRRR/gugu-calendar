@@ -91,7 +91,7 @@ Page({
       data: eventData
     }).then(res => {
       wx.hideLoading();
-      if (res.result && res.result.success && res.result.eventId) {
+      if (res.result && res.result.success) {
         wx.showToast({
           title: '创建成功',
           icon: 'success'

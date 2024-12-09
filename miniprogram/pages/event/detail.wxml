@@ -6,15 +6,15 @@
     <!-- 基本信息区域 -->
     <view class="info-section">
       <view class="info-item">
-        <image class="icon" src="/images/time.png" />
+        <text class="icon">🕒</text>
         <text>{{event.date}} {{event.time}}</text>
       </view>
       <view class="info-item">
-        <image class="icon" src="/images/location.png" />
+        <text class="icon">📍</text>
         <text>{{event.location}}</text>
       </view>
       <view class="info-item">
-        <image class="icon" src="/images/people.png" />
+        <text class="icon">👥</text>
         <text>{{event.participants.length}}{{event.maxParticipants ? '/' + event.maxParticipants : ''}} 人参加</text>
       </view>
     </view>
@@ -30,8 +30,8 @@
       <text class="section-title">参与者</text>
       <view class="participants-list">
         <view class="participant-item" wx:for="{{participants}}" wx:key="openId">
-          <image class="avatar" src="{{item.avatarUrl}}" />
-          <text class="nickname">{{item.nickName}}</text>
+          <text class="avatar">👤</text>
+          <text class="nickname">{{item.nickName || '用户' + index}}</text>
         </view>
       </view>
     </view>

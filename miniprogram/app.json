@@ -3,7 +3,7 @@
     "pages/create/index",
     "pages/profile/index",
     "pages/event/detail",
-    "pages/event/registered/registered"
+    "pages/registered/registered"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -20,7 +20,7 @@
         "selectedIconPath": "/assets/images/home-selected.png"
       },
       {
-        "pagePath": "pages/event/registered/registered",
+        "pagePath": "pages/registered/registered",
         "text": "已注册",
         "iconPath": "/assets/images/add.png",
         "selectedIconPath": "/assets/images/add-selected.png"
