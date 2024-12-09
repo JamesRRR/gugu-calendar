@@ -1,50 +1,67 @@
-<view class="container">
+<view class="event-container">
+  <!-- 事件卡片 -->
   <view class="event-card">
-    <view class="event-header">
-      <text class="event-title">{{event.title}}</text>
-      <text class="event-status {{event.is_cancelled ? 'cancelled' : ''}}">
-        {{event.is_cancelled ? '已取消' : '进行中'}}
-      </text>
-    </view>
-
-    <view class="event-info">
+    <view class="event-title">{{event.title}}</view>
+    
+    <!-- 基本信息区域 -->
+    <view class="info-section">
       <view class="info-item">
-        <text class="label">活动时间</text>
-        <text class="content">{{event.event_date}}</text>
+        <text class="icon">🕒</text>
+        <text>{{event.date}} {{event.time}}</text>
       </view>
-      
       <view class="info-item">
-        <text class="label">活动描述</text>
-        <text class="content">{{event.description}}</text>
+        <text class="icon">📍</text>
+        <text>{{event.location}}</text>
       </view>
-
       <view class="info-item">
-        <text class="label">参与人数</text>
-        <text class="content">{{event.participant_count}}人</text>
+        <text class="icon">👥</text>
+        <text>{{event.participants.length}}{{event.maxParticipants ? '/' + event.maxParticipants : ''}} 人参加</text>
       </view>
     </view>
 
-    <view class="action-buttons">
-      <block wx:if="{{!event.is_cancelled}}">
-        <button 
-          class="action-btn share-btn" 
-          bindtap="shareEvent"
-          wx:if="{{isCreator}}">
-          分享
-        </button>
-        <button 
-          class="action-btn gugu-btn" 
-          bindtap="guguEvent"
-          wx:if="{{!isCreator && hasJoined}}">
-          咕咕
-        </button>
-        <button 
-          class="action-btn {{hasJoined ? 'quit-btn' : 'join-btn'}}" 
-          bindtap="toggleJoin">
-          {{hasJoined ? '退出活动' : '加入活动'}}
-        </button>
-      </block>
-      <text class="cancelled-text" wx:else>该活动已被取消</text>
+    <!-- 详细描述 -->
+    <view class="description-section">
+      <text class="description-title">活动详情</text>
+      <text class="description-content">{{event.description}}</text>
     </view>
+
+    <!-- 参与者列表 -->
+    <view class="participants-section">
+      <text class="section-title">参与者</text>
+      <view class="participants-list">
+        <view class="participant-item" wx:for="{{participants}}" wx:key="openId">
+          <text class="avatar">👤</text>
+          <text class="nickname">{{item.nickName || '用户' + index}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作按钮 -->
+  <view class="action-buttons">
+    <!-- 如果是创建者 -->
+    <block wx:if="{{isCreator}}">
+      <button class="action-btn" bindtap="guguEvent">
+        <text class="iconfont">❌</text>
+        <text>咕咕</text>
+      </button>
+    </block>
+    
+    <!-- 如果不是创建者 -->
+    <block wx:else>
+      <button class="action-btn" bindtap="joinEvent" wx:if="{{!hasJoined && canJoin}}">
+        <text class="iconfont">✅</text>
+        <text>加入</text>
+      </button>
+      <button class="action-btn" bindtap="quitEvent" wx:if="{{hasJoined}}">
+        <text class="iconfont">🚫</text>
+        <text>退出</text>
+      </button>
+    </block>
+    
+    <button class="action-btn share-btn" open-type="share">
+      <text class="iconfont">📢</text>
+      <text>分享</text>
+    </button>
   </view>
 </view> 

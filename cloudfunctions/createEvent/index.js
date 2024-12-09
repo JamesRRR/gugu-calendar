@@ -7,53 +7,42 @@ cloud.init({
 const db = cloud.database()
 
 exports.main = async (event, context) => {
-  console.log('接收到的参数:', event);
+  const wxContext = cloud.getWXContext()
   
   try {
-    const wxContext = cloud.getWXContext()
-    
-    // 检查必要参数
-    if (!event.title) {
-      return {
-        success: false,
-        message: '活动标题不能为空'
-      }
+    console.log('接收到的活动数据:', event)
+
+    // 准备要存储的数据
+    const eventData = {
+      title: event.title,
+      description: event.description,
+      location: event.location,
+      maxParticipants: event.maxParticipants,
+      startTime: event.startTime,
+      status: event.status,
+      creatorId: wxContext.OPENID,
+      participants: [wxContext.OPENID],
+      createTime: db.serverDate()
     }
 
-    if (!event.eventDate) {
-      return {
-        success: false,
-        message: '活动时间不能为空'
-      }
-    }
+    console.log('准备创建活动:', eventData)
 
-    // 创建活动记录
     const result = await db.collection('events').add({
-      data: {
-        title: event.title,
-        description: event.description || '',
-        eventDate: new Date(event.eventDate),
-        creatorId: wxContext.OPENID,
-        isCancelled: false,
-        guguCount: 0,
-        participantCount: 1,
-        createdAt: db.serverDate(),
-        updatedAt: db.serverDate()
-      }
+      data: eventData
     })
 
-    console.log('创建结果:', result);
+    console.log('活动创建结果:', result)
 
+    // 修改返回结构，确保返回正确的 eventId
     return {
       success: true,
-      data: result._id
+      eventId: result._id  // 直接返回 _id 作为 eventId
     }
-
   } catch (err) {
-    console.error('创建活动失败:', err);
+    console.error('创建活动失败:', err)
     return {
       success: false,
-      message: err.message || '创建失败，请重试'
+      message: err.message
     }
   }
 } 

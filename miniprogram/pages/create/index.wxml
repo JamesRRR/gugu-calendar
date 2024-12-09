@@ -1,0 +1,53 @@
+<view class="container">
+  <form bindsubmit="submitEvent">
+    <view class="form-group">
+      <view class="form-item">
+        <text class="label">活动名称</text>
+        <input name="title" placeholder="请输入活动名称" />
+      </view>
+
+      <view class="form-item">
+        <text class="label">活动日期</text>
+        <picker mode="date" value="{{date}}" start="{{minDate}}" bindchange="dateChange">
+          <view class="picker {{date ? '' : 'placeholder'}}">
+            {{date || '请选择日期'}}
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <text class="label">活动时间</text>
+        <picker mode="time" value="{{time}}" bindchange="timeChange">
+          <view class="picker {{time ? '' : 'placeholder'}}">
+            {{time || '请选择时间'}}
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <text class="label">活动地点</text>
+        <input name="location" placeholder="请输入活动地点" />
+      </view>
+
+      <view class="form-item">
+        <text class="label">人数限制</text>
+        <view class="number-input">
+          <view class="number-btn" bindtap="decreaseNumber">-</view>
+          <input name="maxParticipants" type="number" value="{{maxParticipants}}" bindinput="maxParticipantsChange" />
+          <view class="number-btn" bindtap="increaseNumber">+</view>
+        </view>
+        <view class="tips">设置为0表示不限制人数</view>
+      </view>
+
+      <view class="form-item">
+        <text class="label">活动描述</text>
+        <textarea name="description" placeholder="请输入活动描述" maxlength="200" />
+        <view class="word-count">{{description.length}}/200</view>
+      </view>
+    </view>
+
+    <view class="footer">
+      <button form-type="submit" type="primary" class="submit-btn">创建活动</button>
+    </view>
+  </form>
+</view> 

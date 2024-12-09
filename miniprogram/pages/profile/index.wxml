@@ -1,3 +1,37 @@
 <view class="profile-container">
-  <!-- Profile page content -->
+  <!-- 用户信息区域 -->
+  <view class="user-info-section">
+    <block wx:if="{{hasUserInfo}}">
+      <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+        <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      </button>
+      <input 
+        type="nickname" 
+        class="nickname-input" 
+        placeholder="请输入昵称" 
+        placeholder-class="nickname-placeholder"
+        bindnicknamereview="onNicknameChange"
+        value="{{userInfo.nickName}}"
+      />
+    </block>
+    <block wx:else>
+      <button class="login-btn" bindtap="getUserProfile">点击登录</button>
+    </block>
+  </view>
+
+  <!-- 统计信息区域 -->
+  <view class="stats-section">
+    <view class="stat-item">
+      <text class="stat-value">{{stats.totalGuguCount}}</text>
+      <text class="stat-label">咕咕次数</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{stats.participationRate}}</text>
+      <text class="stat-label">参与率</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{stats.totalEvents}}</text>
+      <text class="stat-label">总活动</text>
+    </view>
+  </view>
 </view> 

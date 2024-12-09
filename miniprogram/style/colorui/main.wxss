@@ -1,0 +1,46 @@
+/* ColorUI 主要样式 */
+/* 基础样式 */
+.text-xs { font-size: 20rpx; }
+.text-sm { font-size: 24rpx; }
+.text-df { font-size: 28rpx; }
+.text-lg { font-size: 32rpx; }
+.text-xl { font-size: 36rpx; }
+
+/* 文字颜色 */
+.text-white { color: #ffffff; }
+.text-gray { color: #aaaaaa; }
+.text-black { color: #333333; }
+.text-red { color: #e54d42; }
+.text-orange { color: #f37b1d; }
+.text-yellow { color: #fbbd08; }
+.text-olive { color: #8dc63f; }
+.text-green { color: #39b54a; }
+.text-cyan { color: #1cbbb4; }
+.text-blue { color: #0081ff; }
+.text-purple { color: #6739b6; }
+.text-mauve { color: #9c26b0; }
+.text-pink { color: #e03997; }
+.text-brown { color: #a5673f; }
+
+/* 背景颜色 */
+.bg-white { background-color: #ffffff; }
+.bg-gray { background-color: #f8f8f8; }
+.bg-black { background-color: #333333; }
+.bg-red { background-color: #e54d42; }
+.bg-orange { background-color: #f37b1d; }
+.bg-yellow { background-color: #fbbd08; }
+.bg-olive { background-color: #8dc63f; }
+.bg-green { background-color: #39b54a; }
+.bg-cyan { background-color: #1cbbb4; }
+.bg-blue { background-color: #0081ff; }
+.bg-purple { background-color: #6739b6; }
+.bg-mauve { background-color: #9c26b0; }
+.bg-pink { background-color: #e03997; }
+.bg-brown { background-color: #a5673f; }
+
+/* 圆角 */
+.radius { border-radius: 6rpx; }
+.radius-lg { border-radius: 12rpx; }
+.radius-xl { border-radius: 24rpx; }
+.radius-round { border-radius: 5000rpx; }
+.radius-circle { border-radius: 50%; } 

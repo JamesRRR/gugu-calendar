@@ -1,36 +1,38 @@
 App({
   globalData: {
-    userInfo: null,
-    hasUserInfo: false
+    userInfo: null
   },
 
-  onLaunch() {
+  onLaunch: function() {
+    // 初始化云开发
     if (!wx.cloud) {
       console.error('请使用 2.2.3 或以上的基础库以使用云能力')
     } else {
       wx.cloud.init({
-        env: 'gugu-calender-2-4gc2cjwf8054ba71', // 替换成你的云开发环境ID
-        traceUser: true,
+        env: 'gugu-calender-2-4gc2cjwf8054ba71',
+        traceUser: true
       })
     }
 
-    // 登录
-    wx.login({
-      success: res => {
-        if (res.code) {
-          // 使用云函数处理登录
-          wx.cloud.callFunction({
-            name: 'login',
-            data: {
-              code: res.code
-            },
-            success: (result) => {
-              this.globalData.userInfo = result.result.userInfo;
-              this.globalData.hasUserInfo = true;
-            }
-          });
-        }
-      }
+    // 尝试从本地存储获取用户信息
+    const userInfo = wx.getStorageSync('userInfo')
+    if (userInfo) {
+      this.globalData.userInfo = userInfo
+    }
+  },
+  
+  onShow: function() {
+    console.log('App onShow');
+  },
+
+  onPageNotFound: function(res) {
+    console.error('Page not found:', res);
+    wx.switchTab({
+      url: '/pages/index/index'
     });
+  },
+
+  onError: function(err) {
+    console.error('App error:', err);
   }
 }); 
