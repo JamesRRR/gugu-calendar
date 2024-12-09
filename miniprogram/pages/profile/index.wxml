@@ -1,6 +1,18 @@
-<view class="container">
+<view class="profile-container">
   <view class="user-info">
-    <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
-    <text class="nickname">{{userInfo.nickName}}</text>
+    <block wx:if="{{hasUserInfo}}">
+      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFit"></image>
+      <text class="nickname">{{userInfo.nickName}}</text>
+    </block>
+    <block wx:else>
+      <button class="login-btn" bindtap="getUserProfile">登录</button>
+    </block>
+  </view>
+  
+  <view class="menu-list">
+    <view class="menu-item">
+      <text>我创建的活动</text>
+      <text class="arrow">></text>
+    </view>
   </view>
 </view> 

@@ -1,16 +1,15 @@
-.container {
+.profile-container {
   padding: 20rpx;
 }
 
 .user-info {
-  background: #fff;
-  padding: 40rpx;
-  border-radius: 12rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 40rpx 0;
+  background-color: #fff;
+  border-radius: 10rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.1);
 }
 
 .avatar {
@@ -22,97 +21,34 @@
 
 .nickname {
   font-size: 32rpx;
-  font-weight: bold;
+  color: #333;
 }
 
 .login-btn {
-  background: #07c160;
+  margin: 20rpx;
+  padding: 20rpx 40rpx;
+  background-color: #07c160;
   color: #fff;
-  font-size: 28rpx;
-  padding: 20rpx 60rpx;
-  border-radius: 40rpx;
+  border-radius: 10rpx;
 }
 
-.stats-section {
-  background: #fff;
-  padding: 30rpx;
-  border-radius: 12rpx;
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.1);
+.menu-list {
+  background-color: #fff;
+  border-radius: 10rpx;
 }
 
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.stat-number {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #07c160;
-  margin-bottom: 8rpx;
-}
-
-.stat-label {
-  font-size: 24rpx;
-  color: #666;
-}
-
-.event-list {
-  background: #fff;
-  border-radius: 12rpx;
-  padding: 20rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.1);
-}
-
-.section-title {
-  font-size: 32rpx;
-  font-weight: bold;
-  padding: 20rpx;
-  border-bottom: 2rpx solid #f5f5f5;
-}
-
-.event-item {
-  padding: 20rpx;
+.menu-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2rpx solid #f5f5f5;
+  padding: 30rpx 20rpx;
+  border-bottom: 1rpx solid #eee;
 }
 
-.event-info {
-  flex: 1;
+.menu-item:last-child {
+  border-bottom: none;
 }
 
-.event-title {
-  font-size: 28rpx;
-  font-weight: bold;
-  margin-bottom: 8rpx;
-  display: block;
-}
-
-.event-date {
-  font-size: 24rpx;
-  color: #666;
-}
-
-.event-status {
-  font-size: 24rpx;
-  padding: 4rpx 16rpx;
-  border-radius: 20rpx;
-  background: #07c160;
-  color: #fff;
-}
-
-.event-status.cancelled {
-  background: #ff4d4f;
-}
-
-.empty-tip {
-  text-align: center;
+.arrow {
   color: #999;
-  padding: 40rpx 0;
 } 

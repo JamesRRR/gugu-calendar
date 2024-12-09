@@ -1,7 +1,7 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/profile/profile",
+    "pages/profile/index",
     "pages/event/create",
     "pages/event/detail",
     "pages/event/registered/registered"
@@ -27,7 +27,7 @@
         "selectedIconPath": "/assets/images/add-selected.png"
       },
       {
-        "pagePath": "pages/profile/profile",
+        "pagePath": "pages/profile/index",
         "text": "我的",
         "iconPath": "/assets/images/user.png",
         "selectedIconPath": "/assets/images/user-selected.png"
