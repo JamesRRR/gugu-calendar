@@ -1,0 +1,63 @@
+<view class="container">
+  <!-- 用户信息卡片 -->
+  <view class="user-card">
+    <view class="user-info">
+      <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"/>
+      <view class="user-detail">
+        <text class="nickname">{{userInfo.nickName || '未登录'}}</text>
+        <text class="user-id">ID: {{userId || 'Not Available'}}</text>
+      </view>
+    </view>
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-num">{{stats.totalEvents || 0}}</text>
+        <text class="stat-label">活动总数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{stats.guguCount || 0}}</text>
+        <text class="stat-label">咕咕次数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{stats.attendRate || '0%'}}</text>
+        <text class="stat-label">出勤率</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 活动列表 -->
+  <view class="section-title">我的活动</view>
+  <view class="event-list">
+    <view class="event-tabs">
+      <view class="tab {{activeTab === 'upcoming' ? 'active' : ''}}" 
+            bindtap="switchTab" data-tab="upcoming">即将参加</view>
+      <view class="tab {{activeTab === 'past' ? 'active' : ''}}" 
+            bindtap="switchTab" data-tab="past">历史活动</view>
+    </view>
+    
+    <view class="event-items">
+      <view class="event-item" wx:for="{{events}}" wx:key="id" bindtap="goToEventDetail" data-id="{{item.id}}">
+        <view class="event-time">
+          <text class="date">{{item.date}}</text>
+          <text class="time">{{item.time}}</text>
+        </view>
+        <view class="event-content">
+          <text class="event-title">{{item.title}}</text>
+          <text class="event-location">{{item.location}}</text>
+          <view class="event-status {{item.status}}">{{item.statusText}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能按钮 -->
+  <view class="action-buttons">
+    <button class="action-btn" bindtap="createEvent">
+      <image src="/images/tabbar/add.png" mode="aspectFit"/>
+      <text>创建活动</text>
+    </button>
+    <button class="action-btn" bindtap="showSettings">
+      <image src="/images/tabbar/settings.png" mode="aspectFit"/>
+      <text>设置</text>
+    </button>
+  </view>
+</view> 

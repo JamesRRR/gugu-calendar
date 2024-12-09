@@ -1,0 +1,117 @@
+/* ColorUI 图标样式 */
+@font-face {
+  font-family: "cuIcon";
+  src: url('//at.alicdn.com/t/font_533566_yfq2d9wdij.eot?t=1545239985831');
+}
+
+[class*="cuIcon-"] {
+  font-family: "cuIcon";
+  font-size: inherit;
+  font-style: normal;
+}
+
+.cuIcon-appreciate:before { content: "\e644"; }
+.cuIcon-check:before { content: "\e645"; }
+.cuIcon-close:before { content: "\e646"; }
+.cuIcon-edit:before { content: "\e649"; }
+.cuIcon-emoji:before { content: "\e64a"; }
+.cuIcon-favorfill:before { content: "\e64b"; }
+.cuIcon-favor:before { content: "\e64c"; }
+.cuIcon-loading:before { content: "\e64f"; }
+.cuIcon-locationfill:before { content: "\e650"; }
+.cuIcon-location:before { content: "\e651"; }
+.cuIcon-phone:before { content: "\e652"; }
+.cuIcon-roundcheckfill:before { content: "\e656"; }
+.cuIcon-roundcheck:before { content: "\e657"; }
+.cuIcon-roundclosefill:before { content: "\e658"; }
+.cuIcon-roundclose:before { content: "\e659"; }
+.cuIcon-roundrightfill:before { content: "\e65a"; }
+.cuIcon-roundright:before { content: "\e65b"; }
+.cuIcon-search:before { content: "\e65c"; }
+.cuIcon-taxi:before { content: "\e65d"; }
+.cuIcon-timefill:before { content: "\e65e"; }
+.cuIcon-time:before { content: "\e65f"; }
+.cuIcon-unfold:before { content: "\e661"; }
+.cuIcon-warnfill:before { content: "\e662"; }
+.cuIcon-warn:before { content: "\e663"; }
+.cuIcon-camerafill:before { content: "\e664"; }
+.cuIcon-camera:before { content: "\e665"; }
+.cuIcon-commentfill:before { content: "\e666"; }
+.cuIcon-comment:before { content: "\e667"; }
+.cuIcon-likefill:before { content: "\e668"; }
+.cuIcon-like:before { content: "\e669"; }
+.cuIcon-notificationfill:before { content: "\e66a"; }
+.cuIcon-notification:before { content: "\e66b"; }
+.cuIcon-order:before { content: "\e66c"; }
+.cuIcon-samefill:before { content: "\e66d"; }
+.cuIcon-same:before { content: "\e66e"; }
+.cuIcon-deliver:before { content: "\e671"; }
+.cuIcon-evaluate:before { content: "\e672"; }
+.cuIcon-pay:before { content: "\e673"; }
+.cuIcon-send:before { content: "\e675"; }
+.cuIcon-shop:before { content: "\e676"; }
+.cuIcon-ticket:before { content: "\e677"; }
+.cuIcon-back:before { content: "\e679"; }
+.cuIcon-cascades:before { content: "\e67c"; }
+.cuIcon-discover:before { content: "\e67e"; }
+.cuIcon-list:before { content: "\e682"; }
+.cuIcon-more:before { content: "\e684"; }
+.cuIcon-scan:before { content: "\e689"; }
+.cuIcon-settings:before { content: "\e68a"; }
+.cuIcon-questionfill:before { content: "\e690"; }
+.cuIcon-question:before { content: "\e691"; }
+.cuIcon-shopfill:before { content: "\e697"; }
+.cuIcon-form:before { content: "\e699"; }
+.cuIcon-pic:before { content: "\e69b"; }
+.cuIcon-filter:before { content: "\e69c"; }
+.cuIcon-footprint:before { content: "\e69d"; }
+.cuIcon-top:before { content: "\e69e"; }
+.cuIcon-pulldown:before { content: "\e69f"; }
+.cuIcon-pullup:before { content: "\e6a0"; }
+.cuIcon-right:before { content: "\e6a3"; }
+.cuIcon-refresh:before { content: "\e6a4"; }
+.cuIcon-moreandroid:before { content: "\e6a5"; }
+.cuIcon-deletefill:before { content: "\e6a6"; }
+.cuIcon-refund:before { content: "\e6ac"; }
+.cuIcon-cart:before { content: "\e6af"; }
+.cuIcon-qrcode:before { content: "\e6b0"; }
+.cuIcon-remind:before { content: "\e6b2"; }
+.cuIcon-delete:before { content: "\e6b4"; }
+.cuIcon-profile:before { content: "\e6b7"; }
+.cuIcon-home:before { content: "\e6b8"; }
+.cuIcon-cartfill:before { content: "\e6b9"; }
+.cuIcon-discoverfill:before { content: "\e6ba"; }
+.cuIcon-homefill:before { content: "\e6bb"; }
+.cuIcon-message:before { content: "\e6bc"; }
+.cuIcon-addressbook:before { content: "\e6bd"; }
+.cuIcon-link:before { content: "\e6bf"; }
+.cuIcon-lock:before { content: "\e6c0"; }
+.cuIcon-unlock:before { content: "\e6c2"; }
+.cuIcon-vip:before { content: "\e6c3"; }
+.cuIcon-weibo:before { content: "\e6c4"; }
+.cuIcon-activity:before { content: "\e6c5"; }
+.cuIcon-friendaddfill:before { content: "\e6c9"; }
+.cuIcon-friendadd:before { content: "\e6ca"; }
+.cuIcon-friendfamous:before { content: "\e6cb"; }
+.cuIcon-friend:before { content: "\e6cc"; }
+.cuIcon-goods:before { content: "\e6cd"; }
+.cuIcon-selection:before { content: "\e6ce"; }
+.cuIcon-explore:before { content: "\e6d2"; }
+.cuIcon-present:before { content: "\e6d3"; }
+.cuIcon-squarecheckfill:before { content: "\e6d4"; }
+.cuIcon-square:before { content: "\e6d5"; }
+.cuIcon-squarecheck:before { content: "\e6d6"; }
+.cuIcon-round:before { content: "\e6d7"; }
+.cuIcon-roundaddfill:before { content: "\e6d8"; }
+.cuIcon-roundadd:before { content: "\e6d9"; }
+.cuIcon-add:before { content: "\e6da"; }
+.cuIcon-notificationforbidfill:before { content: "\e6db"; }
+.cuIcon-explorefill:before { content: "\e6dd"; }
+.cuIcon-fold:before { content: "\e6de"; }
+.cuIcon-game:before { content: "\e6df"; }
+.cuIcon-redpacket:before { content: "\e6e0"; }
+.cuIcon-selectionfill:before { content: "\e6e1"; }
+.cuIcon-similar:before { content: "\e6e2"; }
+.cuIcon-appreciatefill:before { content: "\e6e3"; }
+.cuIcon-infofill:before { content: "\e6e4"; }
+.cuIcon-info:before { content: "\e6e5"; } 

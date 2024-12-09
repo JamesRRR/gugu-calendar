@@ -1,8 +1,10 @@
 Page({
   data: {
     event: null,
+    participants: [],
     isCreator: false,
-    hasJoined: false
+    hasJoined: false,
+    canJoin: true
   },
 
   onLoad(options) {
@@ -20,15 +22,23 @@ Page({
       .doc(eventId)
       .get()
       .then(res => {
-        wx.hideLoading();
         const event = res.data;
-        const isCreator = event.creatorId === this.data.userInfo?.openId;
-        
+        const userInfo = wx.getStorageSync('userInfo');
+        const isCreator = event.creatorId === userInfo.openId;
+        const hasJoined = event.participants.includes(userInfo.openId);
+        const canJoin = event.maxParticipants === 0 || 
+                       event.participants.length < event.maxParticipants;
+
         this.setData({
           event,
           isCreator,
-          hasJoined: true // 暂时默认已加入，后续可以添加参与者列表功能
+          hasJoined,
+          canJoin
         });
+
+        // 获取参与者信息
+        this.fetchParticipantsInfo(event.participants);
+        wx.hideLoading();
       })
       .catch(err => {
         wx.hideLoading();
@@ -37,6 +47,87 @@ Page({
           icon: 'none'
         });
       });
+  },
+
+  fetchParticipantsInfo(participantIds) {
+    wx.cloud.callFunction({
+      name: 'getUsers',
+      data: { userIds: participantIds }
+    }).then(res => {
+      if (res.result.success) {
+        this.setData({
+          participants: res.result.users
+        });
+      }
+    });
+  },
+
+  joinEvent() {
+    if (!this.data.canJoin) {
+      wx.showToast({
+        title: '活动人数已满',
+        icon: 'none'
+      });
+      return;
+    }
+
+    wx.showLoading({ title: '处理中...' });
+    wx.cloud.callFunction({
+      name: 'eventOperations',
+      data: {
+        action: 'join',
+        eventId: this.data.event._id
+      }
+    }).then(res => {
+      wx.hideLoading();
+      if (res.result.success) {
+        wx.showToast({
+          title: '加入成功',
+          icon: 'success'
+        });
+        this.fetchEventDetails(this.data.event._id);
+      }
+    }).catch(err => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '操作失败',
+        icon: 'none'
+      });
+    });
+  },
+
+  quitEvent() {
+    wx.showModal({
+      title: '确认退出',
+      content: '确定要退出这个活动吗？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '处理中...' });
+          wx.cloud.callFunction({
+            name: 'eventOperations',
+            data: {
+              action: 'quit',
+              eventId: this.data.event._id
+            }
+          }).then(res => {
+            wx.hideLoading();
+            if (res.result.success) {
+              wx.showToast({
+                title: '退出成功',
+                icon: 'success'
+              });
+              this.fetchEventDetails(this.data.event._id);
+            }
+          }).catch(err => {
+            wx.hideLoading();
+            wx.showToast({
+              title: '操作失败',
+              icon: 'none'
+            });
+          });
+        }
+      }
+    });
   },
 
   guguEvent() {
@@ -71,46 +162,6 @@ Page({
         }
       }
     });
-  },
-
-  quitEvent() {
-    wx.showModal({
-      title: '确认退出',
-      content: '确定要退出这个活动吗？',
-      success: (res) => {
-        if (res.confirm) {
-          wx.showLoading({ title: '处理中...' });
-          wx.cloud.callFunction({
-            name: 'eventOperations',
-            data: {
-              action: 'quit',
-              eventId: this.data.event._id
-            }
-          }).then(res => {
-            wx.hideLoading();
-            if (res.result.success) {
-              wx.showToast({
-                title: '退出成功',
-                icon: 'success',
-                success: () => {
-                  wx.navigateBack();
-                }
-              });
-            }
-          }).catch(err => {
-            wx.hideLoading();
-            wx.showToast({
-              title: '操作失败',
-              icon: 'none'
-            });
-          });
-        }
-      }
-    });
-  },
-
-  shareEvent() {
-    // 分享功能将在小程序审核通过后实现
   },
 
   onShareAppMessage() {

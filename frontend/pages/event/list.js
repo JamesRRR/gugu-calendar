@@ -1,74 +1,73 @@
 Page({
   data: {
     events: [],
-    searchKeyword: '',
-    pageSize: 10,
-    currentPage: 0,
-    hasMore: true
+    loading: true
   },
 
   onLoad: function() {
-    this.loadEvents()
+    this.fetchEvents()
   },
 
-  onReachBottom: function() {
-    if (this.data.hasMore) {
-      this.loadEvents()
-    }
+  onPullDownRefresh: function() {
+    this.fetchEvents()
   },
 
-  loadEvents: async function() {
+  fetchEvents: function() {
     const db = wx.cloud.database()
-    const _ = db.command
     
-    try {
-      let query = db.collection('events')
-      
-      // 如果有搜索关键词，添加搜索条件
-      if (this.data.searchKeyword) {
-        query = query.where(_.or([
-          {
-            title: db.RegExp({
-              regexp: this.data.searchKeyword,
-              options: 'i'
-            })
-          },
-          {
-            description: db.RegExp({
-              regexp: this.data.searchKeyword,
-              options: 'i'
-            })
+    db.collection('events')
+      .orderBy('startTime', 'asc')
+      .get()
+      .then(res => {
+        // 处理时间格式和添加表情
+        const events = res.data.map(event => {
+          const date = new Date(event.startTime)
+          return {
+            ...event,
+            startTime: {
+              date: `${date.getMonth() + 1}月${date.getDate()}日`,
+              time: `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`
+            },
+            categoryEmoji: this.getCategoryEmoji(event.category),
+            statusText: this.getStatusText(event.status)
           }
-        ]))
-      }
-      
-      const events = await query
-        .skip(this.data.currentPage * this.data.pageSize)
-        .limit(this.data.pageSize)
-        .orderBy('createTime', 'desc')
-        .get()
-      
-      this.setData({
-        events: this.data.currentPage === 0 ? events.data : [...this.data.events, ...events.data],
-        currentPage: this.data.currentPage + 1,
-        hasMore: events.data.length === this.data.pageSize
+        })
+
+        this.setData({
+          events,
+          loading: false
+        })
+        wx.stopPullDownRefresh()
       })
-    } catch (err) {
-      console.error(err)
-      wx.showToast({
-        title: '加载失败',
-        icon: 'none'
-      })
-    }
   },
 
-  onSearch: function(e) {
-    this.setData({
-      searchKeyword: e.detail.value,
-      currentPage: 0,
-      events: [],
-      hasMore: true
+  getCategoryEmoji: function(category) {
+    const emojiMap = {
+      'sports': '⚽️',
+      'study': '📚',
+      'game': '🎮',
+      'food': '🍜',
+      'music': '🎵',
+      'movie': '🎬',
+      'travel': '✈️',
+      'other': '🎯'
+    }
+    return emojiMap[category] || '🎯'
+  },
+
+  getStatusText: function(status) {
+    const statusMap = {
+      'ongoing': '进行中',
+      'upcoming': '即将开始',
+      'ended': '已结束'
+    }
+    return statusMap[status] || '进行中'
+  },
+
+  goToEventDetail: function(e) {
+    const eventId = e.currentTarget.dataset.id
+    wx.navigateTo({
+      url: `/pages/event/detail?id=${eventId}`
     })
-    this.loadEvents()
   }
 }) 

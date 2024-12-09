@@ -3,7 +3,8 @@
     "pages/index/index",
     "pages/event/create",
     "pages/event/detail",
-    "pages/event/list"
+    "pages/event/list",
+    "pages/joined/joined"
   ],
   "window": {
     "backgroundTextStyle": "light",

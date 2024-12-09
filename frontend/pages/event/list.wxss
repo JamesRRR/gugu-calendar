@@ -1,102 +1,199 @@
-.container {
-  padding: 20rpx;
-  background: #f8f8f8;
+.list-container {
   min-height: 100vh;
+  background-color: #FFF6F6;
+  padding: 30rpx 20rpx;
 }
 
-/* 搜索框样式 */
-.search-box {
-  padding: 20rpx;
-  background: #fff;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  margin: -20rpx -20rpx 20rpx;
+.header {
+  text-align: center;
+  margin-bottom: 40rpx;
 }
 
-.search-box input {
-  background: #f5f5f5;
-  height: 72rpx;
-  border-radius: 36rpx;
-  padding: 0 30rpx;
-  font-size: 28rpx;
+.header-title {
+  font-size: 36rpx;
+  color: #FF6B6B;
+  font-weight: bold;
 }
 
-/* 活动列表样式 */
-.event-list {
-  padding-bottom: 30rpx;
+.header-emoji {
+  font-size: 40rpx;
+  margin-left: 10rpx;
 }
 
 .event-item {
-  background: #fff;
+  display: flex;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 20rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(255, 182, 193, 0.2);
+  border: 2rpx solid #FFE4E4;
+}
+
+.time-block {
+  background: #FFE4E4;
   border-radius: 16rpx;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
-}
-
-.event-item .title {
-  font-size: 36rpx;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 16rpx;
-  display: block;
-}
-
-.event-item .description {
-  font-size: 28rpx;
-  color: #666;
-  margin-bottom: 20rpx;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-}
-
-.event-item .time,
-.event-item .location {
-  font-size: 26rpx;
-  color: #999;
-  margin-bottom: 8rpx;
-  display: block;
-}
-
-.event-item .participants {
-  font-size: 26rpx;
-  color: #1890ff;
-  margin-top: 16rpx;
-  display: block;
-}
-
-/* 加载更多样式 */
-.loading,
-.no-more {
+  padding: 16rpx;
+  min-width: 120rpx;
   text-align: center;
-  padding: 30rpx;
+  margin-right: 20rpx;
 }
 
-.loading text,
-.no-more text {
+.date {
   font-size: 28rpx;
-  color: #999;
+  color: #FF6B6B;
+  font-weight: bold;
+  margin-bottom: 4rpx;
+  display: block;
 }
 
-/* 空状态样式 */
-.empty-state {
+.time {
+  font-size: 24rpx;
+  color: #FF8B8B;
+  display: block;
+}
+
+.content-block {
+  flex: 1;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.category-emoji {
+  font-size: 32rpx;
+  margin-right: 8rpx;
+}
+
+.title {
+  font-size: 32rpx;
+  color: #333333;
+  font-weight: bold;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.location-emoji {
+  font-size: 24rpx;
+  margin-right: 8rpx;
+}
+
+.location {
+  font-size: 26rpx;
+  color: #666666;
+}
+
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.participants {
+  display: flex;
+  align-items: center;
+}
+
+.people-emoji {
+  font-size: 24rpx;
+  margin-right: 8rpx;
+}
+
+.count {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.status-tag {
+  font-size: 22rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.status-tag.ongoing {
+  background: #FFE4E4;
+  color: #FF6B6B;
+}
+
+.status-tag.upcoming {
+  background: #E4F7FF;
+  color: #4DABFF;
+}
+
+/* 加载动画 */
+.loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 100rpx 30rpx;
+  height: 400rpx;
 }
 
-.empty-state image {
-  width: 200rpx;
-  height: 200rpx;
-  margin-bottom: 30rpx;
+.loading-dots {
+  display: flex;
+  gap: 8rpx;
 }
 
-.empty-state text {
+.dot {
+  width: 16rpx;
+  height: 16rpx;
+  background: #FF8B8B;
+  border-radius: 50%;
+  animation: bounce 0.5s infinite alternate;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.loading-text {
   font-size: 28rpx;
-  color: #999;
+  color: #FF8B8B;
+  margin-top: 20rpx;
+}
+
+/* 空状态 */
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 500rpx;
+}
+
+.empty-emoji {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #FF8B8B;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.empty-subtext {
+  font-size: 26rpx;
+  color: #FFB6C1;
+}
+
+@keyframes bounce {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-10rpx);
+  }
 } 

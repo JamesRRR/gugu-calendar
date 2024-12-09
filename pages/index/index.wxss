@@ -1,0 +1,62 @@
+.container {
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.title {
+  font-size: 24px;
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.balance-card {
+  text-align: center;
+  background: linear-gradient(135deg, var(--primary-color), #FFD1DC);
+  color: white;
+}
+
+.label {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.amount {
+  font-size: 32px;
+  font-weight: bold;
+  display: block;
+  margin-top: 8px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+}
+
+.action-buttons button {
+  width: 45%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-buttons image {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+.records-list {
+  margin-top: 20px;
+} 

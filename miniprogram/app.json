@@ -1,10 +1,10 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/joined/index",
-    "pages/profile/index",
+    "pages/profile/profile",
     "pages/event/create",
-    "pages/event/detail"
+    "pages/event/detail",
+    "pages/event/registered/registered"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -13,28 +13,24 @@
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#1AAD19",
-    "backgroundColor": "#ffffff",
-    "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "新建",
-        "iconPath": "images/home.png",
-        "selectedIconPath": "images/home-active.png"
+        "text": "首页",
+        "iconPath": "/assets/images/home.png",
+        "selectedIconPath": "/assets/images/home-selected.png"
       },
       {
-        "pagePath": "pages/joined/index",
-        "text": "已加入",
-        "iconPath": "images/list.png",
-        "selectedIconPath": "images/list-active.png"
+        "pagePath": "pages/event/registered/registered",
+        "text": "已注册",
+        "iconPath": "/assets/images/add.png",
+        "selectedIconPath": "/assets/images/add-selected.png"
       },
       {
-        "pagePath": "pages/profile/index",
+        "pagePath": "pages/profile/profile",
         "text": "我的",
-        "iconPath": "images/user.png",
-        "selectedIconPath": "images/user-active.png"
+        "iconPath": "/assets/images/user.png",
+        "selectedIconPath": "/assets/images/user-selected.png"
       }
     ]
   },

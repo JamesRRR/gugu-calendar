@@ -1,0 +1,48 @@
+/* 全局样式设置 */
+page {
+  --primary-color: #FFB6C1; /* 粉色作为主色调 */
+  --secondary-color: #FFF0F5;
+  --text-color: #707070;
+  --border-radius: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif;
+  background-color: #FFF5F5;
+}
+
+.container {
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* 通用按钮样式 */
+.cute-btn {
+  background: var(--primary-color);
+  color: white;
+  border-radius: var(--border-radius);
+  padding: 8px 16px;
+  font-size: 14px;
+  box-shadow: 0 4px 8px rgba(255, 182, 193, 0.2);
+  transition: all 0.3s ease;
+}
+
+.cute-btn:active {
+  transform: scale(0.95);
+}
+
+/* 通用卡片样式 */
+.cute-card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 16px;
+  margin: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 通用输入框样式 */
+.cute-input {
+  background: white;
+  border: 2px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  padding: 8px 12px;
+  margin: 8px 0;
+} 

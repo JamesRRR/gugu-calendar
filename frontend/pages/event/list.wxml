@@ -1,27 +1,56 @@
-<view class="container">
-  <view class="search-box">
-    <input 
-      type="text" 
-      placeholder="搜索活动" 
-      bindinput="onSearch"
-      value="{{searchKeyword}}"
-    />
+<view class="list-container">
+  <!-- 顶部装饰 -->
+  <view class="header">
+    <text class="header-title">活动列表</text>
+    <text class="header-emoji">🎈</text>
   </view>
 
-  <view class="event-list">
-    <view class="event-item" wx:for="{{events}}" wx:key="_id" bindtap="goToDetail" data-id="{{item._id}}">
-      <text class="title">{{item.title}}</text>
-      <text class="description">{{item.description}}</text>
-      <text class="time">{{item.time}}</text>
-      <text class="location">{{item.location}}</text>
-      <text class="participants">参与人数：{{item.participants.length}}</text>
+  <!-- 活动列表 -->
+  <view class="events-list" wx:if="{{!loading}}">
+    <view class="event-item" wx:for="{{events}}" wx:key="_id" bindtap="goToEventDetail" data-id="{{item._id}}">
+      <!-- 左侧时间显示 -->
+      <view class="time-block">
+        <text class="date">{{item.startTime.date}}</text>
+        <text class="time">{{item.startTime.time}}</text>
+      </view>
+
+      <!-- 右侧内容 -->
+      <view class="content-block">
+        <view class="title-row">
+          <text class="category-emoji">{{item.categoryEmoji}}</text>
+          <text class="title">{{item.title}}</text>
+        </view>
+
+        <view class="info-row">
+          <text class="location-emoji">📍</text>
+          <text class="location">{{item.location}}</text>
+        </view>
+
+        <view class="footer-row">
+          <view class="participants">
+            <text class="people-emoji">👥</text>
+            <text class="count">{{item.currentParticipants}}/{{item.maxParticipants}}人</text>
+          </view>
+          <view class="status-tag {{item.status}}">{{item.statusText}}</view>
+        </view>
+      </view>
     </view>
   </view>
 
-  <view class="loading" wx:if="{{hasMore}}">
-    <text>加载中...</text>
+  <!-- 加载中状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-dots">
+      <view class="dot"></view>
+      <view class="dot"></view>
+      <view class="dot"></view>
+    </view>
+    <text class="loading-text">加载中...</text>
   </view>
-  <view class="no-more" wx:else>
-    <text>没有更多了</text>
+
+  <!-- 空状态 -->
+  <view class="empty-container" wx:if="{{!loading && events.length === 0}}">
+    <text class="empty-emoji">🎪</text>
+    <text class="empty-text">还没有活动呢~</text>
+    <text class="empty-subtext">快去参加一个吧！</text>
   </view>
 </view> 

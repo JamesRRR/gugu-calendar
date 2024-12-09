@@ -1,0 +1,40 @@
+<view class="container">
+  <view class="cute-card">
+    <view class="type-selector">
+      <view class="{{type === 'income' ? 'type-btn active' : 'type-btn'}}" bindtap="switchType" data-type="income">
+        <image src="/images/income-icon.png" mode="aspectFit"/>
+        <text>收入</text>
+      </view>
+      <view class="{{type === 'expense' ? 'type-btn active' : 'type-btn'}}" bindtap="switchType" data-type="expense">
+        <image src="/images/expense-icon.png" mode="aspectFit"/>
+        <text>支出</text>
+      </view>
+    </view>
+
+    <view class="input-group">
+      <text class="label">金额</text>
+      <input class="cute-input amount-input" type="digit" placeholder="请输入金额" value="{{amount}}" bindinput="onAmountInput"/>
+    </view>
+
+    <view class="input-group">
+      <text class="label">分类</text>
+      <view class="category-list">
+        <view class="category-item {{selectedCategory === item ? 'active' : ''}}" 
+              wx:for="{{categories}}" 
+              wx:key="index"
+              bindtap="selectCategory"
+              data-category="{{item}}">
+          <image src="/images/categories/{{item}}.png" mode="aspectFit"/>
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="input-group">
+      <text class="label">备注</text>
+      <input class="cute-input" placeholder="添加备注" value="{{note}}" bindinput="onNoteInput"/>
+    </view>
+
+    <button class="cute-btn submit-btn" bindtap="submitRecord">保存</button>
+  </view>
+</view> 
