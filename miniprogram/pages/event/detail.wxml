@@ -39,27 +39,29 @@
 
   <!-- 底部操作按钮 -->
   <view class="action-buttons">
-    <block wx:if="{{!isCreator && !hasJoined}}">
-      <button class="join-btn" bindtap="joinEvent" disabled="{{!canJoin}}">
-        {{canJoin ? '加入活动' : '人数已满'}}
+    <!-- 如果是创建者 -->
+    <block wx:if="{{isCreator}}">
+      <button class="action-btn" bindtap="guguEvent">
+        <text class="iconfont">❌</text>
+        <text>咕咕</text>
       </button>
     </block>
     
-    <block wx:if="{{hasJoined || isCreator}}">
-      <view class="button-group">
-        <button class="action-btn quit-btn" bindtap="quitEvent">
-          <image class="btn-icon" src="/images/quit.png" />
-          退出
-        </button>
-        <button class="action-btn share-btn" open-type="share">
-          <image class="btn-icon" src="/images/share.png" />
-          分享
-        </button>
-        <button class="action-btn gugu-btn" bindtap="guguEvent">
-          <image class="btn-icon" src="/images/gugu.png" />
-          咕咕
-        </button>
-      </view>
+    <!-- 如果不是创建者 -->
+    <block wx:else>
+      <button class="action-btn" bindtap="joinEvent" wx:if="{{!hasJoined && canJoin}}">
+        <text class="iconfont">✅</text>
+        <text>加入</text>
+      </button>
+      <button class="action-btn" bindtap="quitEvent" wx:if="{{hasJoined}}">
+        <text class="iconfont">🚫</text>
+        <text>退出</text>
+      </button>
     </block>
+    
+    <button class="action-btn share-btn" open-type="share">
+      <text class="iconfont">📢</text>
+      <text>分享</text>
+    </button>
   </view>
 </view> 

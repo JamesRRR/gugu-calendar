@@ -8,14 +8,16 @@ Page({
   },
 
   onLoad(options) {
+    console.log('Detail page options:', options);
     if (!options.id) {
+      console.error('No event ID provided');
       wx.showToast({
         title: '参数错误',
         icon: 'none'
       });
       setTimeout(() => {
         wx.switchTab({
-          url: '/pages/index/index'
+          url: '/pages/create/index'
         });
       }, 1500);
       return;
@@ -24,6 +26,7 @@ Page({
   },
 
   fetchEventDetails(eventId) {
+    console.log('Fetching event details for ID:', eventId);
     if (!eventId) {
       console.error('eventId is undefined');
       return;
@@ -33,22 +36,14 @@ Page({
       title: '加载中...',
     });
 
-    const userInfo = getApp().globalData.userInfo;
-    if (!userInfo || !userInfo.openId) {
-      wx.hideLoading();
-      wx.showToast({
-        title: '请先登录',
-        icon: 'none'
-      });
-      return;
-    }
-
     const db = wx.cloud.database();
     db.collection('events')
       .doc(eventId)
       .get()
       .then(res => {
+        console.log('Event details:', res.data);
         const event = res.data;
+        const userInfo = getApp().globalData.userInfo;
         const isCreator = event.creatorId === userInfo.openId;
         const hasJoined = event.participants.includes(userInfo.openId);
         const canJoin = event.maxParticipants === 0 || 
@@ -61,7 +56,6 @@ Page({
           canJoin
         });
 
-        // 获取参与者信息
         this.fetchParticipantsInfo(event.participants);
         wx.hideLoading();
       })
@@ -74,7 +68,7 @@ Page({
         });
         setTimeout(() => {
           wx.switchTab({
-            url: '/pages/index/index'
+            url: '/pages/create/index'
           });
         }, 1500);
       });
