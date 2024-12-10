@@ -163,6 +163,8 @@ input {
   text-align: center;
   font-size: 32rpx;
   color: #333;
+  height: 112rpx !important;
+  line-height: 112rpx !important;
 }
 
 .tips {
@@ -170,4 +172,10 @@ input {
   color: #999;
   margin-top: 12rpx;
   padding-left: 24rpx;
+}
+
+input[name="maxParticipants"] {
+  text-align: center;
+  height: 112rpx !important;
+  line-height: 112rpx !important;
 } 
