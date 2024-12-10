@@ -101,8 +101,13 @@ Page({
                 title: '已退出活动',
                 icon: 'success'
               });
-              // 刷新页面数据
-              this.fetchEventDetails(this.data.event._id);
+              
+              // 延迟后跳转到已注册活动列表页面
+              setTimeout(() => {
+                wx.switchTab({
+                  url: '/pages/registered/registered'
+                });
+              }, 1500);
             }
           }).catch(err => {
             console.error('退出活动失败：', err);
@@ -145,7 +150,7 @@ Page({
               if (res.result.cancelled) {
                 wx.showModal({
                   title: '活动已取消',
-                  content: '由于超过半数参与者咕咕，活��已自动取消',
+                  content: `由于超过半数参与者咕咕，活动"${this.data.event.title}"已自动取消`,
                   showCancel: false
                 });
               }

@@ -11,7 +11,8 @@ Page({
   },
 
   onLoad() {
-    const userInfo = getApp().globalData.userInfo;
+    // 尝试从本地存储获取用户信息
+    const userInfo = wx.getStorageSync('userInfo');
     if (userInfo) {
       this.setData({
         userInfo: userInfo,
@@ -21,27 +22,70 @@ Page({
     }
   },
 
-  onShow() {
-    const userInfo = getApp().globalData.userInfo;
-    if (userInfo && !this.data.hasUserInfo) {
-      this.setData({
-        userInfo: userInfo,
-        hasUserInfo: true
-      });
-      this.loadUserStats();
-    }
+  getUserProfile() {
+    wx.getUserProfile({
+      desc: '用于完善用户资料', // 声明获取用户个人信息后的用途
+      success: (res) => {
+        const userInfo = res.userInfo;
+        
+        // 先调用登录云函数获取 openId
+        wx.cloud.callFunction({
+          name: 'login'
+        }).then(loginRes => {
+          const completeUserInfo = {
+            ...userInfo,
+            openId: loginRes.result.openid
+          };
+          
+          // 保存到全局数据和本地存储
+          getApp().globalData.userInfo = completeUserInfo;
+          wx.setStorageSync('userInfo', completeUserInfo);
+          
+          this.setData({
+            userInfo: completeUserInfo,
+            hasUserInfo: true
+          });
+          
+          this.loadUserStats();
+
+          // 更新到云端
+          wx.cloud.callFunction({
+            name: 'updateUser',
+            data: {
+              userInfo: completeUserInfo
+            }
+          }).catch(err => {
+            console.error('更新用户信息失败：', err);
+          });
+        }).catch(err => {
+          console.error('登录失败：', err);
+          wx.showToast({
+            title: '登录失败',
+            icon: 'none'
+          });
+        });
+      },
+      fail: (err) => {
+        console.error('获取用户信息失败：', err);
+        wx.showToast({
+          title: '获取用户信息失败',
+          icon: 'none'
+        });
+      }
+    });
   },
 
   onChooseAvatar(e) {
     const { avatarUrl } = e.detail;
-    const userInfo = { ...this.data.userInfo, avatarUrl };
+    const userInfo = { 
+      ...this.data.userInfo, 
+      avatarUrl
+    };
     
-    // 更新本地和全局数据
     this.setData({ userInfo });
     getApp().globalData.userInfo = userInfo;
     wx.setStorageSync('userInfo', userInfo);
 
-    // 更新到云端
     wx.cloud.callFunction({
       name: 'updateUser',
       data: {
@@ -53,18 +97,15 @@ Page({
   },
 
   onNicknameChange(e) {
-    console.log('昵称变更:', e.detail);  // 添加日志
-    const nickName = e.detail.value || e.detail.nickname;
+    const nickName = e.detail.value;
     if (!nickName) return;
-
+    
     const userInfo = { ...this.data.userInfo, nickName };
     
-    // 更新本地和全局数据
     this.setData({ userInfo });
     getApp().globalData.userInfo = userInfo;
     wx.setStorageSync('userInfo', userInfo);
 
-    // 更新到云端
     wx.cloud.callFunction({
       name: 'updateUser',
       data: {
@@ -72,47 +113,6 @@ Page({
       }
     }).catch(err => {
       console.error('更新昵称失败：', err);
-    });
-  },
-
-  getUserProfile() {
-    // 先调用登录云函数获取 openId
-    wx.cloud.callFunction({
-      name: 'login'
-    }).then(loginRes => {
-      // 创建初始用户信息
-      const userInfo = {
-        openId: loginRes.result.openid,
-        avatarUrl: '/images/default-avatar.png', // 添加一个默认头像
-        nickName: '微信用户'
-      };
-      
-      // 保存到全局数据
-      getApp().globalData.userInfo = userInfo;
-      // 保存到本地存储
-      wx.setStorageSync('userInfo', userInfo);
-      
-      this.setData({
-        userInfo: userInfo,
-        hasUserInfo: true
-      });
-      this.loadUserStats();
-
-      // 调用云函数更新用户信息
-      wx.cloud.callFunction({
-        name: 'updateUser',
-        data: {
-          userInfo: userInfo
-        }
-      }).catch(err => {
-        console.error('更新用户信���失败：', err);
-      });
-    }).catch(err => {
-      console.error('登录失败：', err);
-      wx.showToast({
-        title: '登录失败',
-        icon: 'none'
-      });
     });
   },
 
