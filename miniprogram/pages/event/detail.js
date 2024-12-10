@@ -1,16 +1,12 @@
 Page({
   data: {
     event: null,
-    participants: [],
     isCreator: false,
-    hasJoined: false,
-    canJoin: true
+    hasJoined: false
   },
 
   onLoad(options) {
-    console.log('Detail page options:', options);
     if (!options.id) {
-      console.error('No event ID provided');
       wx.showToast({
         title: '参数错误',
         icon: 'none'
@@ -26,11 +22,7 @@ Page({
   },
 
   fetchEventDetails(eventId) {
-    console.log('Fetching event details for ID:', eventId);
-    if (!eventId) {
-      console.error('eventId is undefined');
-      return;
-    }
+    if (!eventId) return;
 
     wx.showLoading({
       title: '加载中...',
@@ -41,22 +33,26 @@ Page({
       .doc(eventId)
       .get()
       .then(res => {
-        console.log('Event details:', res.data);
+        console.log('活动数据:', res.data);
         const event = res.data;
         const userInfo = getApp().globalData.userInfo;
+        
+        console.log('当前用户:', userInfo);
+        console.log('活动参与者:', event.participants);
+
         const isCreator = event.creatorId === userInfo.openId;
-        const hasJoined = event.participants.includes(userInfo.openId);
-        const canJoin = event.maxParticipants === 0 || 
-                       event.participants.length < event.maxParticipants;
+        const hasJoined = Array.isArray(event.participants) && 
+                         event.participants.includes(userInfo.openId);
+
+        console.log('是否创建者:', isCreator);
+        console.log('是否已参加:', hasJoined);
 
         this.setData({
           event,
           isCreator,
-          hasJoined,
-          canJoin
+          hasJoined
         });
 
-        this.fetchParticipantsInfo(event.participants);
         wx.hideLoading();
       })
       .catch(err => {
@@ -74,79 +70,45 @@ Page({
       });
   },
 
-  fetchParticipantsInfo(participantIds) {
-    wx.cloud.callFunction({
-      name: 'getUsers',
-      data: { userIds: participantIds }
-    }).then(res => {
-      if (res.result.success) {
-        this.setData({
-          participants: res.result.users
-        });
-      }
-    });
+  // 分享配置
+  onShareAppMessage() {
+    const event = this.data.event;
+    return {
+      title: event.title,
+      path: `/pages/event/detail?id=${event._id}`,
+      imageUrl: '/images/share-cover.png'
+    };
   },
 
-  joinEvent() {
-    if (!this.data.canJoin) {
-      wx.showToast({
-        title: '活动人数已满',
-        icon: 'none'
-      });
-      return;
-    }
-
-    wx.showLoading({ title: '处理中...' });
-    wx.cloud.callFunction({
-      name: 'eventOperations',
-      data: {
-        action: 'join',
-        eventId: this.data.event._id
-      }
-    }).then(res => {
-      wx.hideLoading();
-      if (res.result.success) {
-        wx.showToast({
-          title: '加入成功',
-          icon: 'success'
-        });
-        this.fetchEventDetails(this.data.event._id);
-      }
-    }).catch(err => {
-      wx.hideLoading();
-      wx.showToast({
-        title: '操作失败',
-        icon: 'none'
-      });
-    });
-  },
-
+  // 退出活动
   quitEvent() {
     wx.showModal({
       title: '确认退出',
-      content: '确定要退出这个活动吗？',
+      content: '确定要退出该活动吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.showLoading({ title: '处理中...' });
+          wx.showLoading({ title: '处理中' });
+          
           wx.cloud.callFunction({
-            name: 'eventOperations',
+            name: 'quitEvent',
             data: {
-              action: 'quit',
               eventId: this.data.event._id
             }
           }).then(res => {
             wx.hideLoading();
             if (res.result.success) {
               wx.showToast({
-                title: '退出成功',
+                title: '已退出活动',
                 icon: 'success'
               });
+              // 刷新页面数据
               this.fetchEventDetails(this.data.event._id);
             }
           }).catch(err => {
+            console.error('退出活动失败：', err);
             wx.hideLoading();
             wx.showToast({
-              title: '操作失败',
+              title: '退出失败',
               icon: 'none'
             });
           });
@@ -155,29 +117,41 @@ Page({
     });
   },
 
+  // 咕咕功能
   guguEvent() {
     wx.showModal({
       title: '确认咕咕',
       content: '确定要咕咕这个活动吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.showLoading({ title: '处理中...' });
+          wx.showLoading({ title: '处理中' });
+          
           wx.cloud.callFunction({
-            name: 'eventOperations',
+            name: 'guguEvent',
             data: {
-              action: 'gugu',
               eventId: this.data.event._id
             }
           }).then(res => {
             wx.hideLoading();
             if (res.result.success) {
               wx.showToast({
-                title: res.result.message,
+                title: '已咕咕',
                 icon: 'success'
               });
+              // 刷新页面数据
               this.fetchEventDetails(this.data.event._id);
+
+              // 如果活动被取消，发送通知
+              if (res.result.cancelled) {
+                wx.showModal({
+                  title: '活动已取消',
+                  content: '由于超过半数参与者咕咕，活��已自动取消',
+                  showCancel: false
+                });
+              }
             }
           }).catch(err => {
+            console.error('咕咕失败：', err);
             wx.hideLoading();
             wx.showToast({
               title: '操作失败',
@@ -189,10 +163,40 @@ Page({
     });
   },
 
-  onShareAppMessage() {
-    return {
-      title: this.data.event.title,
-      path: `/pages/event/detail?id=${this.data.event._id}`
-    };
+  // 取消活动
+  cancelEvent() {
+    wx.showModal({
+      title: '确认取消',
+      content: '确定要取消这个活动吗？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '处理中' });
+          
+          wx.cloud.callFunction({
+            name: 'cancelEvent',
+            data: {
+              eventId: this.data.event._id
+            }
+          }).then(res => {
+            wx.hideLoading();
+            if (res.result.success) {
+              wx.showToast({
+                title: '已取消活动',
+                icon: 'success'
+              });
+              // 刷新页面数据
+              this.fetchEventDetails(this.data.event._id);
+            }
+          }).catch(err => {
+            console.error('取消活动失败：', err);
+            wx.hideLoading();
+            wx.showToast({
+              title: '操作失败',
+              icon: 'none'
+            });
+          });
+        }
+      }
+    });
   }
 }); 

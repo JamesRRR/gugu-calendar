@@ -3,6 +3,11 @@
   <view class="event-card">
     <view class="event-title">{{event.title}}</view>
     
+    <!-- 添加活动状态提示 -->
+    <view class="cancelled-tip" wx:if="{{event.status === 'cancelled'}}">
+      此活动已取消
+    </view>
+    
     <!-- 基本信息区域 -->
     <view class="info-section">
       <view class="info-item">
@@ -39,29 +44,42 @@
 
   <!-- 底部操作按钮 -->
   <view class="action-buttons">
-    <!-- 如果是创建者 -->
-    <block wx:if="{{isCreator}}">
-      <button class="action-btn" bindtap="guguEvent">
-        <text class="iconfont">❌</text>
-        <text>咕咕</text>
-      </button>
-    </block>
-    
-    <!-- 如果不是创建者 -->
-    <block wx:else>
-      <button class="action-btn" bindtap="joinEvent" wx:if="{{!hasJoined && canJoin}}">
-        <text class="iconfont">✅</text>
-        <text>加入</text>
-      </button>
-      <button class="action-btn" bindtap="quitEvent" wx:if="{{hasJoined}}">
-        <text class="iconfont">🚫</text>
-        <text>退出</text>
-      </button>
-    </block>
-    
-    <button class="action-btn share-btn" open-type="share">
-      <text class="iconfont">📢</text>
+    <!-- 分享按钮 - 所有人可见 -->
+    <button 
+      class="action-btn share-btn" 
+      open-type="share">
+      <text class="icon">📢</text>
       <text>分享</text>
     </button>
+
+    <!-- 未参加时显示加入按钮 -->
+    <button 
+      class="action-btn join-btn" 
+      wx:if="{{!hasJoined && event.status !== 'cancelled'}}"
+      bindtap="joinEvent">
+      <text class="icon">✅</text>
+      <text>加入</text>
+    </button>
+
+    <!-- 已参加时显示退出和咕咕按钮 -->
+    <block wx:if="{{hasJoined}}">
+      <button 
+        class="action-btn quit-btn" 
+        bindtap="quitEvent"
+        disabled="{{event.status === 'cancelled'}}"
+        wx:if="{{event.status !== 'cancelled'}}">
+        <text class="icon">🚪</text>
+        <text>退出</text>
+      </button>
+
+      <button 
+        class="action-btn gugu-btn" 
+        bindtap="guguEvent"
+        disabled="{{event.status === 'gugu' || event.status === 'cancelled'}}"
+        wx:if="{{event.status !== 'cancelled'}}">
+        <text class="icon">🕊️</text>
+        <text>{{event.status === 'gugu' ? '已咕咕' : '咕咕'}}</text>
+      </button>
+    </block>
   </view>
 </view> 
