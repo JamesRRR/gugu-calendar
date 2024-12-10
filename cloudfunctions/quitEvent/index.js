@@ -9,7 +9,8 @@ exports.main = async (event, context) => {
   try {
     const result = await db.collection('events').doc(eventId).update({
       data: {
-        participants: db.command.pull(wxContext.OPENID)
+        participants: db.command.pull(wxContext.OPENID),
+        quitUsers: db.command.addToSet(wxContext.OPENID)
       }
     })
 
@@ -17,6 +18,7 @@ exports.main = async (event, context) => {
       success: true
     }
   } catch (err) {
+    console.error(err)
     return {
       success: false,
       message: err.message
