@@ -33,6 +33,7 @@ exports.main = async (event, context) => {
       cancelled: shouldCancel
     }
   } catch (err) {
+    console.error(err)
     return {
       success: false,
       message: err.message

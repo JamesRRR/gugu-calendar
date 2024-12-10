@@ -3,6 +3,11 @@
   <view class="event-card">
     <view class="event-title">{{event.title}}</view>
     
+    <!-- 添加活动状态提示 -->
+    <view class="cancelled-tip" wx:if="{{event.status === 'cancelled'}}">
+      此活动已取消
+    </view>
+    
     <!-- 基本信息区域 -->
     <view class="info-section">
       <view class="info-item">
@@ -50,7 +55,7 @@
     <!-- 未参加时显示加入按钮 -->
     <button 
       class="action-btn join-btn" 
-      wx:if="{{!hasJoined}}"
+      wx:if="{{!hasJoined && event.status !== 'cancelled'}}"
       bindtap="joinEvent">
       <text class="icon">✅</text>
       <text>加入</text>
@@ -60,7 +65,9 @@
     <block wx:if="{{hasJoined}}">
       <button 
         class="action-btn quit-btn" 
-        bindtap="quitEvent">
+        bindtap="quitEvent"
+        disabled="{{event.status === 'cancelled'}}"
+        wx:if="{{event.status !== 'cancelled'}}">
         <text class="icon">🚪</text>
         <text>退出</text>
       </button>
@@ -68,7 +75,8 @@
       <button 
         class="action-btn gugu-btn" 
         bindtap="guguEvent"
-        disabled="{{event.status === 'gugu' || event.status === 'cancelled'}}">
+        disabled="{{event.status === 'gugu' || event.status === 'cancelled'}}"
+        wx:if="{{event.status !== 'cancelled'}}">
         <text class="icon">🕊️</text>
         <text>{{event.status === 'gugu' ? '已咕咕' : '咕咕'}}</text>
       </button>

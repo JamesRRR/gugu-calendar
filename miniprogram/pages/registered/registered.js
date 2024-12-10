@@ -32,7 +32,8 @@ Page({
     const db = wx.cloud.database();
     db.collection('events')
       .where({
-        participants: userInfo.openId
+        participants: userInfo.openId,
+        status: db.command.neq('cancelled')
       })
       .orderBy('startTime', 'asc')
       .get()
