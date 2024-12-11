@@ -7,41 +7,58 @@ cloud.init({
 const db = cloud.database()
 
 exports.main = async (event, context) => {
-  const { userId } = event
-  
   try {
-    // 获取用户参与的所有活动
-    const events = await db.collection('events')
+    console.log('Getting stats for user:', event.userId)
+    
+    // 获取用户基本信息，包括 regretPoints
+    const userResult = await db.collection('users')
       .where({
-        participants: userId
+        _openid: event.userId
       })
       .get()
-      .then(res => res.data)
 
-    // 统计数据
-    const stats = events.reduce((acc, event) => {
-      acc.totalEvents++
-      if (event.status === 'gugu') {
-        acc.totalGuguCount++
-      } else if (event.status === 'completed') {
-        acc.completedEvents++
-      }
-      return acc
-    }, {
-      totalEvents: 0,
-      totalGuguCount: 0,
-      completedEvents: 0
-    })
+    console.log('User data:', userResult.data)
+
+    // 获取用户参与的活动统计
+    const eventsResult = await db.collection('events')
+      .where({
+        participants: event.userId
+      })
+      .get()
+
+    // 获取用户咕咕（未参加）的活动数量
+    const guguCount = await db.collection('events')
+      .where({
+        participants: event.userId,
+        absentees: event.userId
+      })
+      .count()
+
+    const user = userResult.data[0] || {}
+    const events = eventsResult.data || []
+    
+    // 计算完成的活动数（总活动减去咕咕次数）
+    const totalEvents = events.length
+    const completedEvents = totalEvents - guguCount.total
+
+    const stats = {
+      totalGuguCount: guguCount.total,
+      totalEvents: totalEvents,
+      completedEvents: completedEvents,
+      regretPoints: user.regretPoints || 0
+    }
+
+    console.log('Returning stats:', stats)
 
     return {
       success: true,
       stats
     }
   } catch (err) {
-    console.error(err)
+    console.error('获取用户统计信息失败：', err)
     return {
       success: false,
-      message: err.message
+      error: err
     }
   }
 } 

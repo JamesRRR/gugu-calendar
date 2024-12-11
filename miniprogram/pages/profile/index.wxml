@@ -33,6 +33,10 @@
       <text class="stat-value">{{stats.totalEvents}}</text>
       <text class="stat-label">总活动</text>
     </view>
+    <view class="stat-item">
+      <text class="stat-value">{{stats.regretPoints}}</text>
+      <text class="stat-label">咕咕点数</text>
+    </view>
   </view>
 
   <!-- 菜单区域 -->
