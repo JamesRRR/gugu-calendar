@@ -90,4 +90,41 @@
   color: #999;
   font-size: 28rpx;
   line-height: 80rpx;
+}
+
+.menu-section {
+  margin-top: 30rpx;
+  padding: 0 30rpx;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.05);
+  margin: 0 0 20rpx 0;
+  font-weight: normal;
+  line-height: 1;
+  border: none;
+}
+
+.menu-item::after {
+  display: none;
+}
+
+.menu-item:active {
+  opacity: 0.8;
+}
+
+.menu-item .icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.menu-item text {
+  font-size: 28rpx;
+  color: #333;
 } 

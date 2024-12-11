@@ -3,7 +3,9 @@
     "pages/create/index",
     "pages/profile/index",
     "pages/event/detail",
-    "pages/registered/registered"
+    "pages/registered/registered",
+    "pages/faq/index",
+    "pages/intro/index"
   ],
   "window": {
     "backgroundTextStyle": "light",

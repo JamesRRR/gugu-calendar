@@ -140,5 +140,33 @@ Page({
         });
       }
     }).catch(console.error);
+  },
+
+  goToFAQ() {
+    console.log('Navigating to FAQ');
+    wx.navigateTo({
+      url: '/pages/faq/index',
+      fail: (err) => {
+        console.error('Navigation failed:', err);
+        wx.showToast({
+          title: '页面跳转失败',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
+  goToIntro() {
+    console.log('Navigating to Intro');
+    wx.navigateTo({
+      url: '/pages/intro/index',
+      fail: (err) => {
+        console.error('Navigation failed:', err);
+        wx.showToast({
+          title: '页面跳转失败',
+          icon: 'none'
+        });
+      }
+    });
   }
 }); 

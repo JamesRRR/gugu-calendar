@@ -1,0 +1,27 @@
+.intro-container {
+  padding: 30rpx;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.intro-content {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+
+.description {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.8;
+  margin-bottom: 20rpx;
+  text-align: justify;
+} 

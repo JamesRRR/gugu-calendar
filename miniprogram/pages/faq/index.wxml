@@ -1,0 +1,6 @@
+<view class="faq-container">
+  <view class="faq-item" wx:for="{{faqList}}" wx:key="question">
+    <view class="question">{{item.question}}</view>
+    <view class="answer">{{item.answer}}</view>
+  </view>
+</view> 
