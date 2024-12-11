@@ -1,28 +1,39 @@
 .create-container {
   min-height: 100vh;
-  background: #f8f8f8;
+  background: #fff6f6;
   padding: 30rpx;
 }
 
 .form-card {
   background: #fff;
-  border-radius: 20rpx;
+  border-radius: 24rpx;
   padding: 40rpx 30rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4rpx 16rpx rgba(255, 182, 193, 0.2);
+  border: 2rpx solid #ffe4e6;
   margin-bottom: 30rpx;
 }
 
-.form-title {
+.card-title {
+  display: flex;
+  align-items: center;
   font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
+  color: #ff8c98;
+  font-weight: 600;
   margin-bottom: 30rpx;
-  padding-left: 20rpx;
-  border-left: 8rpx solid #07c160;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx dashed #ffe4e6;
+}
+
+.card-title .icon {
+  margin-right: 16rpx;
 }
 
 .form-item {
   margin-bottom: 30rpx;
+}
+
+.form-item:last-child {
+  margin-bottom: 0;
 }
 
 .label {
@@ -34,18 +45,19 @@
 
 .required::after {
   content: '*';
-  color: #ff4d4f;
+  color: #ff8c98;
   margin-left: 8rpx;
 }
 
-input {
+.input {
   width: 100%;
   height: 88rpx;
-  background: #f8f8f8;
-  border-radius: 12rpx;
+  background: #fff8f8;
+  border-radius: 16rpx;
   padding: 0 24rpx;
   font-size: 28rpx;
   color: #333;
+  border: 2rpx solid #ffe4e6;
 }
 
 .time-container {
@@ -56,79 +68,97 @@ input {
 .picker {
   flex: 1;
   height: 88rpx;
-  line-height: 88rpx;
-  background: #f8f8f8;
-  border-radius: 12rpx;
+  background: #fff8f8;
+  border-radius: 16rpx;
   padding: 0 24rpx;
   font-size: 28rpx;
   color: #333;
+  border: 2rpx solid #ffe4e6;
+  display: flex;
+  align-items: center;
 }
 
-.picker-placeholder {
+.picker .icon {
+  margin-right: 12rpx;
+}
+
+.empty {
   color: #999;
 }
 
 .location-picker {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   height: 88rpx;
-  background: #f8f8f8;
-  border-radius: 12rpx;
+  background: #fff8f8;
+  border-radius: 16rpx;
   padding: 0 24rpx;
   font-size: 28rpx;
   color: #333;
+  border: 2rpx solid #ffe4e6;
+  display: flex;
+  align-items: center;
 }
 
-.location-placeholder {
-  color: #999;
+.location-picker .icon {
+  margin-right: 12rpx;
 }
 
 .slider-container {
-  padding: 20rpx 0;
+  background: #fff8f8;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  border: 2rpx solid #ffe4e6;
 }
 
 .slider-value {
   text-align: center;
-  font-size: 32rpx;
-  color: #07c160;
+  font-size: 28rpx;
+  color: #ff8c98;
   margin-bottom: 20rpx;
 }
 
-textarea {
+.tips {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 12rpx;
+  padding-left: 24rpx;
+}
+
+.textarea {
   width: 100%;
   height: 200rpx;
-  background: #f8f8f8;
-  border-radius: 12rpx;
+  background: #fff8f8;
+  border-radius: 16rpx;
   padding: 24rpx;
   font-size: 28rpx;
   color: #333;
+  border: 2rpx solid #ffe4e6;
 }
 
 .word-count {
   text-align: right;
   font-size: 24rpx;
   color: #999;
-  margin-top: 8rpx;
-}
-
-.tips {
-  font-size: 24rpx;
-  color: #999;
-  margin-top: 8rpx;
+  margin-top: 12rpx;
+  padding-right: 24rpx;
 }
 
 .submit-btn {
   width: 90%;
   height: 88rpx;
-  background: #07c160;
+  background: #ff8c98;
   border-radius: 44rpx;
   color: #fff;
   font-size: 32rpx;
   margin-top: 60rpx;
+  margin-bottom: 60rpx;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
+}
+
+.submit-btn .icon {
+  margin-right: 12rpx;
 }
 
 .submit-btn::after {
