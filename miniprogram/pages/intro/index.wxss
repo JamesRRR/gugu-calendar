@@ -1,27 +1,95 @@
 .intro-container {
-  padding: 30rpx;
-  background: #f5f5f5;
   min-height: 100vh;
-}
-
-.intro-content {
-  background: #fff;
-  border-radius: 12rpx;
+  background: #fff6f6;
   padding: 30rpx;
 }
 
-.title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333;
-  text-align: center;
+.intro-card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  box-shadow: 0 4rpx 16rpx rgba(255, 182, 193, 0.2);
+  border: 2rpx solid #ffe4e6;
   margin-bottom: 30rpx;
 }
 
-.description {
+.card-title {
+  display: flex;
+  align-items: center;
+  font-size: 36rpx;
+  color: #ff8c98;
+  font-weight: 600;
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx dashed #ffe4e6;
+}
+
+.card-title .icon {
+  margin-right: 16rpx;
+}
+
+.intro-content {
+  padding: 20rpx 0;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.step-num {
+  width: 40rpx;
+  height: 40rpx;
+  background: #ff8c98;
+  color: #fff;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  margin-right: 20rpx;
+}
+
+.step-text {
   font-size: 28rpx;
   color: #666;
-  line-height: 1.8;
-  margin-bottom: 20rpx;
-  text-align: justify;
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.feature-item {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4rpx 16rpx rgba(255, 182, 193, 0.2);
+  border: 2rpx solid #ffe4e6;
+}
+
+.feature-item .icon {
+  font-size: 48rpx;
+  margin-right: 24rpx;
+}
+
+.feature-info {
+  flex: 1;
+}
+
+.feature-info .title {
+  font-size: 30rpx;
+  color: #ff8c98;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.feature-info .desc {
+  font-size: 26rpx;
+  color: #999;
 } 

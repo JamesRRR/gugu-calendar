@@ -2,7 +2,7 @@
   <view class="event-list">
     <view class="event-item" wx:for="{{events}}" wx:key="_id" bindtap="goToEventDetail" data-id="{{item._id}}">
       <view class="event-header">
-        <text class="event-title">{{item.title}}</text>
+        <text class="event-title">🌸 {{item.title}}</text>
         <text class="event-status {{item.status}}">{{item.statusText}}</text>
       </view>
       
@@ -34,6 +34,7 @@
 
   <!-- 空状态提示 -->
   <view class="empty-state" wx:if="{{events.length === 0}}">
-    <text>还没有参加任何活动哦</text>
+    <text>还没有参加任何活动呢~</text>
+    <text>快去创建或加入一个活动吧！</text>
   </view>
 </view> 

@@ -1,11 +1,46 @@
 <view class="intro-container">
-  <view class="intro-content">
-    <view class="title">关于咕咕日历</view>
-    <view class="description">
-      你是否有过类似的经历：晚上不想出门，却因为提前和朋友约好了见面，不想被当成"鸽王"，无奈只能硬着头皮出发。直到事后才发现，原来你的朋友也有一样的心态，想取消活动却迫于面子不好意思开口。
+  <view class="intro-card">
+    <view class="card-title">
+      <text class="icon">🌸</text>
+      <text>欢迎使用咕咕日历</text>
     </view>
-    <view class="description">
-      有了咕咕日历，你就再也不用担心遇到这样的窘境！在你和朋友们使用咕咕日历创建活动后，如果你临时改变主意不想出门，只需要在活动页面点击后悔键。当你的朋友们也都后悔了，活动就会自动取消。如果有朋友没有点击后悔，他们也不会知道你曾偷偷改变了心意。
+    <view class="intro-content">
+      <view class="step-item">
+        <text class="step-num">1</text>
+        <text class="step-text">创建或加入活动</text>
+      </view>
+      <view class="step-item">
+        <text class="step-num">2</text>
+        <text class="step-text">参与活动获得咕咕点数</text>
+      </view>
+      <view class="step-item">
+        <text class="step-num">3</text>
+        <text class="step-text">咕咕时将扣除对应点数</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="feature-list">
+    <view class="feature-item">
+      <text class="icon">✨</text>
+      <view class="feature-info">
+        <text class="title">创建活动</text>
+        <text class="desc">轻松创建活动并邀请好友</text>
+      </view>
+    </view>
+    <view class="feature-item">
+      <text class="icon">💝</text>
+      <view class="feature-info">
+        <text class="title">咕咕点数</text>
+        <text class="desc">合理使用咕咕机制</text>
+      </view>
+    </view>
+    <view class="feature-item">
+      <text class="icon">🎀</text>
+      <view class="feature-info">
+        <text class="title">活动管理</text>
+        <text class="desc">便捷管理所有活动</text>
+      </view>
     </view>
   </view>
 </view> 
