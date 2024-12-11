@@ -194,10 +194,17 @@ Page({
       fail: (err) => {
         console.error('Navigation failed:', err);
         wx.showToast({
-          title: '页面跳转失败',
+          title: '页面��转失败',
           icon: 'none'
         });
       }
     });
+  },
+
+  onShow() {
+    // 每次页面显示时刷新用户统计信息
+    if (this.data.hasUserInfo) {
+      this.loadUserStats();
+    }
   }
 }); 

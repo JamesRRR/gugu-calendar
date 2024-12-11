@@ -32,6 +32,8 @@ Page({
     });
 
     const db = wx.cloud.database();
+    
+    // 首先获取活动信息
     db.collection('events')
       .doc(eventId)
       .get()
@@ -61,6 +63,23 @@ Page({
           formattedStartTime,
           formattedEndTime
         });
+
+        // 获取所有参与者的用户信息
+        if (event.participants && event.participants.length > 0) {
+          db.collection('users')
+            .where({
+              _openid: db.command.in(event.participants)
+            })
+            .get()
+            .then(userRes => {
+              this.setData({
+                participants: userRes.data
+              });
+            })
+            .catch(err => {
+              console.error('获取参与者信息失败：', err);
+            });
+        }
 
         wx.hideLoading();
       })
@@ -158,8 +177,15 @@ Page({
           title: '已咕咕',
           icon: 'success'
         });
+        
         // 刷新页面数据
         this.fetchEventDetails(this.data.event._id);
+
+        // 刷新个人中心页面的数据
+        const profilePage = getCurrentPages().find(page => page.route === 'pages/profile/index');
+        if (profilePage) {
+          profilePage.loadUserStats();
+        }
 
         // 如果活动被取消，发送通知
         if (res.result.cancelled) {
@@ -169,6 +195,11 @@ Page({
             showCancel: false
           });
         }
+      } else {
+        wx.showToast({
+          title: res.result.message || '咕咕失败',
+          icon: 'none'
+        });
       }
     }).catch(err => {
       console.error('咕咕失败：', err);
