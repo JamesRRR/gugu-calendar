@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/create/index",
     "pages/profile/index",
+    "pages/create/index",
     "pages/event/detail",
     "pages/registered/registered",
     "pages/faq/index",
@@ -10,7 +10,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "咕咕活动",
+    "navigationBarTitleText": "咕咕日历",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
@@ -21,22 +21,22 @@
     "borderStyle": "white",
     "list": [
       {
-        "pagePath": "pages/create/index",
-        "text": "创建活动",
-        "icon": "home",
-        "selectedIcon": "home-fill"
-      },
-      {
-        "pagePath": "pages/registered/registered",
-        "text": "已注册",
-        "icon": "list",
-        "selectedIcon": "list-fill"
-      },
-      {
         "pagePath": "pages/profile/index",
         "text": "我的",
         "icon": "user",
         "selectedIcon": "user-fill"
+      },
+      {
+        "pagePath": "pages/create/index",
+        "text": "创建活动",
+        "icon": "plus-circle",
+        "selectedIcon": "plus-circle-fill"
+      },
+      {
+        "pagePath": "pages/registered/registered",
+        "text": "已注册",
+        "icon": "calendar",
+        "selectedIcon": "calendar-fill"
       }
     ]
   },

@@ -145,6 +145,27 @@ Page({
           title: '创建成功',
           icon: 'success'
         });
+
+        // 重置表单数据
+        this.setData({
+          formData: {
+            title: '',
+            startDate: '',
+            startTime: '',
+            endDate: '',
+            endTime: '',
+            location: {
+              name: '',
+              latitude: null,
+              longitude: null
+            },
+            maxParticipants: '',
+            regretPointsRequired: 1,
+            description: ''
+          },
+          descriptionLength: 0
+        });
+
         // 跳转到活动详情页
         wx.navigateTo({
           url: `/pages/event/detail?id=${res.result.eventId}`
@@ -162,6 +183,29 @@ Page({
         title: '创建失败',
         icon: 'none'
       });
+    });
+  },
+
+  // 添加页面显示时的处理函数
+  onShow() {
+    // 每次显示页面时重置表单数据
+    this.setData({
+      formData: {
+        title: '',
+        startDate: '',
+        startTime: '',
+        endDate: '',
+        endTime: '',
+        location: {
+          name: '',
+          latitude: null,
+          longitude: null
+        },
+        maxParticipants: '',
+        regretPointsRequired: 1,
+        description: ''
+      },
+      descriptionLength: 0
     });
   }
 }); 
