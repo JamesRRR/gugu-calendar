@@ -12,11 +12,15 @@
     <view class="info-section">
       <view class="info-item">
         <text class="icon">🕒</text>
-        <text>{{event.date}} {{event.time}}</text>
+        <text>{{formattedStartTime}}</text>
+      </view>
+      <view class="info-item" wx:if="{{formattedEndTime}}">
+        <text class="icon">⏰</text>
+        <text>{{formattedEndTime}}</text>
       </view>
       <view class="info-item">
         <text class="icon">📍</text>
-        <text>{{event.location}}</text>
+        <text>{{event.location.name}}</text>
       </view>
       <view class="info-item">
         <text class="icon">👥</text>
@@ -74,7 +78,7 @@
 
       <button 
         class="action-btn gugu-btn" 
-        bindtap="guguEvent"
+        bindtap="onRegret"
         disabled="{{event.status === 'gugu' || event.status === 'cancelled'}}"
         wx:if="{{event.status !== 'cancelled'}}">
         <text class="icon">🕊️</text>
