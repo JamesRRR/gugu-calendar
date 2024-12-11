@@ -1,0 +1,14 @@
+<view class="faq-container">
+  <view class="faq-list">
+    <view class="faq-item" wx:for="{{faqs}}" wx:key="index">
+      <view class="question">
+        <text class="icon">💭</text>
+        <text class="text">{{item.q}}</text>
+      </view>
+      <view class="answer">
+        <text class="icon">🌸</text>
+        <text class="text">{{item.a}}</text>
+      </view>
+    </view>
+  </view>
+</view> 

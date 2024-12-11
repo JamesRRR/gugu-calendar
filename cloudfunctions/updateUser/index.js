@@ -12,33 +12,34 @@ exports.main = async (event, context) => {
   
   try {
     // 检查用户是否已存在
-    const user = await db.collection('users').where({
-      openId: wxContext.OPENID
-    }).get()
-
-    if (user.data.length === 0) {
-      // 创建新用户
+    const userCheck = await db.collection('users')
+      .where({
+        _openid: wxContext.OPENID
+      })
+      .get()
+    
+    if (userCheck.data.length === 0) {
+      // 新用户，创建带有初始点数的记录
       await db.collection('users').add({
         data: {
-          openId: wxContext.OPENID,
-          nickName: userInfo.nickName,
-          avatarUrl: userInfo.avatarUrl,
+          ...userInfo,
+          _openid: wxContext.OPENID,
+          regretPoints: 5,  // 初始点数
+          lastPointsUpdate: db.serverDate(),  // 记录最后更新时间
           createTime: db.serverDate()
         }
       })
     } else {
-      // 更新现有用户
+      // 已存在的用户，只更新用户信息
       await db.collection('users').where({
-        openId: wxContext.OPENID
+        _openid: wxContext.OPENID
       }).update({
         data: {
-          nickName: userInfo.nickName,
-          avatarUrl: userInfo.avatarUrl,
-          updateTime: db.serverDate()
+          ...userInfo
         }
       })
     }
-
+    
     return {
       success: true
     }
@@ -46,7 +47,7 @@ exports.main = async (event, context) => {
     console.error(err)
     return {
       success: false,
-      message: err.message
+      error: err
     }
   }
 } 

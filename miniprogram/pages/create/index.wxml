@@ -1,53 +1,131 @@
-<view class="container">
-  <form bindsubmit="submitEvent">
-    <view class="form-group">
+<view class="create-container">
+  <form bindsubmit="submitForm">
+    <!-- 基本信息卡片 -->
+    <view class="form-card">
+      <view class="card-title">
+        <text class="icon">🌸</text>
+        <text>基本信息</text>
+      </view>
+      
       <view class="form-item">
-        <text class="label">活动名称</text>
-        <input name="title" placeholder="请输入活动名称" />
+        <text class="label required">活动名称</text>
+        <input 
+          class="input" 
+          name="title" 
+          placeholder="给活动起个可爱的名字吧~" 
+          value="{{formData.title}}" 
+          bindinput="onTitleInput" 
+        />
       </view>
 
       <view class="form-item">
-        <text class="label">活动日期</text>
-        <picker mode="date" value="{{date}}" start="{{minDate}}" bindchange="dateChange">
-          <view class="picker {{date ? '' : 'placeholder'}}">
-            {{date || '请选择日期'}}
-          </view>
-        </picker>
+        <text class="label required">开始时间</text>
+        <view class="time-container">
+          <picker mode="date" value="{{formData.startDate}}" bindchange="onStartDateChange">
+            <view class="picker {{formData.startDate ? '' : 'empty'}}">
+              <text class="icon">📅</text>
+              <text>{{formData.startDate || '选择日期'}}</text>
+            </view>
+          </picker>
+          <picker mode="time" value="{{formData.startTime}}" bindchange="onStartTimeChange">
+            <view class="picker {{formData.startTime ? '' : 'empty'}}">
+              <text class="icon">⏰</text>
+              <text>{{formData.startTime || '选择时间'}}</text>
+            </view>
+          </picker>
+        </view>
       </view>
 
       <view class="form-item">
-        <text class="label">活动时间</text>
-        <picker mode="time" value="{{time}}" bindchange="timeChange">
-          <view class="picker {{time ? '' : 'placeholder'}}">
-            {{time || '请选择时间'}}
-          </view>
-        </picker>
+        <text class="label">结束时间（可选）</text>
+        <view class="time-container">
+          <picker mode="date" value="{{formData.endDate}}" bindchange="onEndDateChange">
+            <view class="picker {{formData.endDate ? '' : 'empty'}}">
+              <text class="icon">📅</text>
+              <text>{{formData.endDate || '选择日期'}}</text>
+            </view>
+          </picker>
+          <picker mode="time" value="{{formData.endTime}}" bindchange="onEndTimeChange">
+            <view class="picker {{formData.endTime ? '' : 'empty'}}">
+              <text class="icon">⏰</text>
+              <text>{{formData.endTime || '选择时间'}}</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+    </view>
+
+    <!-- 活动设置卡片 -->
+    <view class="form-card">
+      <view class="card-title">
+        <text class="icon">✨</text>
+        <text>活动设置</text>
       </view>
 
       <view class="form-item">
-        <text class="label">活动地点</text>
-        <input name="location" placeholder="请输入活动地点" />
+        <text class="label required">活动地点</text>
+        <view class="location-picker" bindtap="chooseLocation">
+          <text class="icon">📍</text>
+          <text class="{{formData.location.name ? '' : 'empty'}}">
+            {{formData.location.name || '点击选择活动地点~'}}
+          </text>
+        </view>
       </view>
 
       <view class="form-item">
         <text class="label">人数限制</text>
-        <view class="number-input">
-          <view class="number-btn" bindtap="decreaseNumber">-</view>
-          <input name="maxParticipants" type="number" value="{{maxParticipants}}" bindinput="maxParticipantsChange" />
-          <view class="number-btn" bindtap="increaseNumber">+</view>
-        </view>
-        <view class="tips">设置为0表示不限制人数</view>
+        <input 
+          class="input" 
+          type="number" 
+          name="maxParticipants" 
+          placeholder="不填则不限制人数哦~" 
+          value="{{formData.maxParticipants}}" 
+        />
       </view>
 
       <view class="form-item">
-        <text class="label">活动描述</text>
-        <textarea name="description" placeholder="请输入活动描述" maxlength="200" />
-        <view class="word-count">{{description.length}}/200</view>
+        <text class="label">咕咕点数要求</text>
+        <view class="slider-container">
+          <view class="slider-value">需要 {{formData.regretPointsRequired}} 点咕咕点数</view>
+          <slider 
+            min="1" 
+            max="10" 
+            value="{{formData.regretPointsRequired}}" 
+            activeColor="#ff8c98"
+            backgroundColor="#ffe4e6"
+            block-color="#ff8c98"
+            show-value="{{false}}"
+            bindchange="onRegretPointsChange" 
+          />
+        </view>
+        <text class="tips">咕咕时将扣除对应点数哦~</text>
       </view>
     </view>
 
-    <view class="footer">
-      <button form-type="submit" type="primary" class="submit-btn">创建活动</button>
+    <!-- 活动详情卡片 -->
+    <view class="form-card">
+      <view class="card-title">
+        <text class="icon">💝</text>
+        <text>活动详情</text>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">活动简介</text>
+        <textarea 
+          class="textarea" 
+          name="description" 
+          placeholder="写点什么来介绍这个活动吧~" 
+          maxlength="500" 
+          value="{{formData.description}}" 
+          bindinput="onDescriptionInput"
+        />
+        <text class="word-count">{{descriptionLength}}/500</text>
+      </view>
     </view>
+
+    <button class="submit-btn" form-type="submit">
+      <text class="icon">🎀</text>
+      <text>创建活动</text>
+    </button>
   </form>
 </view> 

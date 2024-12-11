@@ -1,112 +1,184 @@
 Page({
   data: {
-    date: '',
-    time: '',
-    minDate: '',
-    maxParticipants: 0,
-    description: ''
+    formData: {
+      title: '',
+      startDate: '',
+      startTime: '',
+      endDate: '',
+      endTime: '',
+      location: {
+        name: '',
+        latitude: null,
+        longitude: null
+      },
+      maxParticipants: '',
+      regretPointsRequired: 1,
+      description: ''
+    },
+    descriptionLength: 0
   },
 
-  onLoad() {
-    // 设置最小日期为今天
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
+  // 输入处理函数
+  onTitleInput(e) {
     this.setData({
-      minDate: `${year}-${month}-${day}`
+      'formData.title': e.detail.value
     });
   },
 
-  dateChange(e) {
+  onStartDateChange(e) {
     this.setData({
-      date: e.detail.value
+      'formData.startDate': e.detail.value
     });
   },
 
-  timeChange(e) {
+  onStartTimeChange(e) {
     this.setData({
-      time: e.detail.value
+      'formData.startTime': e.detail.value
     });
   },
 
-  // 添加表单提交方法
-  submitEvent(e) {
-    const userInfo = getApp().globalData.userInfo;
-    if (!userInfo || !userInfo.openId) {
-      wx.showToast({
-        title: '请先登录',
-        icon: 'none'
-      });
-      return;
-    }
+  onEndDateChange(e) {
+    this.setData({
+      'formData.endDate': e.detail.value
+    });
+  },
 
-    const formData = e.detail.value;
+  onEndTimeChange(e) {
+    this.setData({
+      'formData.endTime': e.detail.value
+    });
+  },
+
+  onRegretPointsChange(e) {
+    this.setData({
+      'formData.regretPointsRequired': e.detail.value
+    });
+  },
+
+  onDescriptionInput(e) {
+    const value = e.detail.value;
+    this.setData({
+      'formData.description': value,
+      descriptionLength: value.length
+    });
+  },
+
+  // 选择地点
+  chooseLocation() {
+    wx.chooseLocation({
+      success: (res) => {
+        this.setData({
+          'formData.location': {
+            name: res.name || res.address,
+            address: res.address,
+            latitude: res.latitude,
+            longitude: res.longitude
+          }
+        });
+      },
+      fail: (err) => {
+        console.error('选择地点失败:', err);
+        wx.showToast({
+          title: '选择地点失败',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
+  // 表单提交
+  submitForm(e) {
+    const formData = this.data.formData;
     
-    // 表单验证
-    if (!formData.title || !formData.title.trim()) {
-      wx.showToast({
+    // 验证必填字段
+    if (!formData.title.trim()) {
+      return wx.showToast({
         title: '请输入活动名称',
         icon: 'none'
       });
-      return;
     }
 
-    if (!this.data.date || !this.data.time) {
-      wx.showToast({
-        title: '请选择活动时间',
+    if (!formData.startDate) {
+      return wx.showToast({
+        title: '请选择开始日期',
         icon: 'none'
       });
-      return;
     }
 
-    const datetime = new Date(`${this.data.date} ${this.data.time}`);
-    if (isNaN(datetime.getTime())) {
-      wx.showToast({
-        title: '时间格式错误',
+    if (!formData.location.name) {
+      return wx.showToast({
+        title: '请选择活动地点',
         icon: 'none'
       });
-      return;
     }
 
-    wx.showLoading({
-      title: '创建中...',
-      mask: true
-    });
+    // 构建开始时间和结束时间
+    const startTime = new Date(`${formData.startDate} ${formData.startTime || '00:00'}`).getTime();
+    let endTime = null;
+    if (formData.endDate) {
+      endTime = new Date(`${formData.endDate} ${formData.endTime || '23:59'}`).getTime();
+      if (endTime < startTime) {
+        return wx.showToast({
+          title: '结束时间不能早于开始时间',
+          icon: 'none'
+        });
+      }
+    }
 
-    const eventData = {
-      title: formData.title.trim(),
-      description: formData.description ? formData.description.trim() : '',
-      location: formData.location ? formData.location.trim() : '',
-      maxParticipants: parseInt(formData.maxParticipants) || 0,
-      startTime: datetime,
-      creatorId: userInfo.openId,
-      status: 'upcoming',
-      createTime: new Date(),
-      participants: [userInfo.openId]
-    };
-
+    // 调用云函数创建活动
+    wx.showLoading({ title: '创建中' });
     wx.cloud.callFunction({
       name: 'createEvent',
-      data: eventData
+      data: {
+        title: formData.title,
+        startTime,
+        endTime,
+        location: formData.location,
+        maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : null,
+        regretPointsRequired: formData.regretPointsRequired,
+        description: formData.description
+      }
     }).then(res => {
       wx.hideLoading();
-      if (res.result && res.result.success) {
+      if (res.result.success) {
         wx.showToast({
           title: '创建成功',
           icon: 'success'
         });
-        setTimeout(() => {
-          wx.redirectTo({
-            url: `/pages/event/detail?id=${res.result.eventId}`
-          });
-        }, 1500);
+
+        // 重置表单数据
+        this.setData({
+          formData: {
+            title: '',
+            startDate: '',
+            startTime: '',
+            endDate: '',
+            endTime: '',
+            location: {
+              name: '',
+              latitude: null,
+              longitude: null
+            },
+            maxParticipants: '',
+            regretPointsRequired: 1,
+            description: ''
+          },
+          descriptionLength: 0
+        });
+
+        // 跳转到活动详情页
+        wx.navigateTo({
+          url: `/pages/event/detail?id=${res.result.eventId}`
+        });
       } else {
-        throw new Error(res.result ? res.result.message : '创建失败');
+        wx.showToast({
+          title: res.result.message || '创建失败',
+          icon: 'none'
+        });
       }
     }).catch(err => {
-      console.error('创建活动失败：', err);
       wx.hideLoading();
+      console.error('创建活动失败:', err);
       wx.showToast({
         title: '创建失败',
         icon: 'none'
@@ -114,26 +186,26 @@ Page({
     });
   },
 
-  // 人数限制相关方法
-  maxParticipantsChange(e) {
-    let value = parseInt(e.detail.value) || 0;
-    if (value < 0) value = 0;
+  // 添加页面显示时的处理函数
+  onShow() {
+    // 每次显示页面时重置表单数据
     this.setData({
-      maxParticipants: value
-    });
-  },
-
-  decreaseNumber() {
-    let value = this.data.maxParticipants - 1;
-    if (value < 0) value = 0;
-    this.setData({
-      maxParticipants: value
-    });
-  },
-
-  increaseNumber() {
-    this.setData({
-      maxParticipants: this.data.maxParticipants + 1
+      formData: {
+        title: '',
+        startDate: '',
+        startTime: '',
+        endDate: '',
+        endTime: '',
+        location: {
+          name: '',
+          latitude: null,
+          longitude: null
+        },
+        maxParticipants: '',
+        regretPointsRequired: 1,
+        description: ''
+      },
+      descriptionLength: 0
     });
   }
 }); 

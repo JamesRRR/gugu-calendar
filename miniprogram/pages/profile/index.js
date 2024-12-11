@@ -6,7 +6,8 @@ Page({
       totalGuguCount: 0,
       totalEvents: 0,
       completedEvents: 0,
-      participationRate: '0%'
+      participationRate: '0%',
+      regretPoints: 0
     }
   },
 
@@ -18,13 +19,26 @@ Page({
         userInfo: userInfo,
         hasUserInfo: true
       });
-      this.loadUserStats();
+      // 确保userInfo中有openId
+      if (userInfo.openId) {
+        this.loadUserStats();
+      } else {
+        // 如果没有openId，重新获取
+        wx.cloud.callFunction({
+          name: 'login'
+        }).then(res => {
+          userInfo.openId = res.result.openid;
+          wx.setStorageSync('userInfo', userInfo);
+          this.setData({ userInfo });
+          this.loadUserStats();
+        });
+      }
     }
   },
 
   getUserProfile() {
     wx.getUserProfile({
-      desc: '用于完善用户资料', // 声明获取用户个人信息后的用途
+      desc: '用于完善用户资料',
       success: (res) => {
         const userInfo = res.userInfo;
         
@@ -46,14 +60,15 @@ Page({
             hasUserInfo: true
           });
           
-          this.loadUserStats();
-
-          // 更新到云端
+          // 确保在更新用户信息后再加载统计信息
           wx.cloud.callFunction({
             name: 'updateUser',
             data: {
               userInfo: completeUserInfo
             }
+          }).then(() => {
+            // 在updateUser成功后加载统计信息
+            this.loadUserStats();
           }).catch(err => {
             console.error('更新用户信息失败：', err);
           });
@@ -117,8 +132,13 @@ Page({
   },
 
   loadUserStats() {
-    const userInfo = getApp().globalData.userInfo;
-    if (!userInfo || !userInfo.openId) return;
+    const userInfo = this.data.userInfo;
+    console.log('Loading stats for user:', userInfo); // 添加日志
+
+    if (!userInfo || !userInfo.openId) {
+      console.log('No user info or openId available'); // 添加日志
+      return;
+    }
 
     wx.cloud.callFunction({
       name: 'getUserStats',
@@ -126,19 +146,65 @@ Page({
         userId: userInfo.openId
       }
     }).then(res => {
+      console.log('getUserStats response:', res.result);
       if (res.result.success) {
         const stats = res.result.stats;
+        console.log('Stats from cloud:', stats);
         const participationRate = stats.totalEvents > 0 
           ? ((stats.completedEvents / stats.totalEvents) * 100).toFixed(1)
           : 0;
         
+        const finalStats = {
+          ...stats,
+          participationRate: participationRate + '%',
+          regretPoints: stats.regretPoints || 0
+        };
+        console.log('Final stats to be set:', finalStats);
+        
         this.setData({
-          stats: {
-            ...stats,
-            participationRate: participationRate + '%'
-          }
+          stats: finalStats
+        }, () => {
+          // 在setData的回调中确认数据已更新
+          console.log('Current stats after update:', this.data.stats);
         });
       }
-    }).catch(console.error);
+    }).catch(err => {
+      console.error('Failed to load user stats:', err);
+    });
+  },
+
+  goToFAQ() {
+    console.log('Navigating to FAQ');
+    wx.navigateTo({
+      url: '/pages/faq/index',
+      fail: (err) => {
+        console.error('Navigation failed:', err);
+        wx.showToast({
+          title: '页面跳转失败',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
+  goToIntro() {
+    console.log('Navigating to Intro');
+    wx.navigateTo({
+      url: '/pages/intro/index',
+      fail: (err) => {
+        console.error('Navigation failed:', err);
+        wx.showToast({
+          title: '页面��转失败',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
+  onShow() {
+    // 每次页面显示时刷新用户统计信息
+    if (this.data.hasUserInfo) {
+      this.loadUserStats();
+    }
   }
 }); 

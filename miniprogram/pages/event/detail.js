@@ -2,7 +2,10 @@ Page({
   data: {
     event: null,
     isCreator: false,
-    hasJoined: false
+    hasJoined: false,
+    eventDetail: null,
+    formattedStartTime: '',
+    formattedEndTime: ''
   },
 
   onLoad(options) {
@@ -29,6 +32,8 @@ Page({
     });
 
     const db = wx.cloud.database();
+    
+    // 首先获取活动信息
     db.collection('events')
       .doc(eventId)
       .get()
@@ -37,21 +42,44 @@ Page({
         const event = res.data;
         const userInfo = getApp().globalData.userInfo;
         
-        console.log('当前用户:', userInfo);
-        console.log('活动参与者:', event.participants);
+        // 格式化时间
+        const startTime = new Date(event.startTime);
+        const formattedStartTime = `${startTime.getFullYear()}年${startTime.getMonth() + 1}月${startTime.getDate()}日 ${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`;
+        
+        let formattedEndTime = '';
+        if (event.endTime) {
+          const endTime = new Date(event.endTime);
+          formattedEndTime = `${endTime.getFullYear()}年${endTime.getMonth() + 1}月${endTime.getDate()}日 ${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`;
+        }
 
         const isCreator = event.creatorId === userInfo.openId;
         const hasJoined = Array.isArray(event.participants) && 
                          event.participants.includes(userInfo.openId);
 
-        console.log('是否创建者:', isCreator);
-        console.log('是否已参加:', hasJoined);
-
         this.setData({
           event,
           isCreator,
-          hasJoined
+          hasJoined,
+          formattedStartTime,
+          formattedEndTime
         });
+
+        // 获取所有参与者的用户信息
+        if (event.participants && event.participants.length > 0) {
+          db.collection('users')
+            .where({
+              _openid: db.command.in(event.participants)
+            })
+            .get()
+            .then(userRes => {
+              this.setData({
+                participants: userRes.data
+              });
+            })
+            .catch(err => {
+              console.error('获取参与者信息失败：', err);
+            });
+        }
 
         wx.hideLoading();
       })
@@ -62,11 +90,6 @@ Page({
           title: '加载失败',
           icon: 'none'
         });
-        setTimeout(() => {
-          wx.switchTab({
-            url: '/pages/create/index'
-          });
-        }, 1500);
       });
   },
 
@@ -122,49 +145,69 @@ Page({
     });
   },
 
-  // 咕咕功能
-  guguEvent() {
+  // 点击咕咕按钮时的处理
+  onRegret() {
+    const event = this.data.event;
     wx.showModal({
       title: '确认咕咕',
-      content: '确定要咕咕这个活动吗？',
+      content: `咕咕这个活动将扣除 ${event.regretPointsRequired || 1} 个咕咕点数，确定要咕咕吗？`,
+      confirmText: '确定咕咕',
+      confirmColor: '#e64340',
       success: (res) => {
         if (res.confirm) {
-          wx.showLoading({ title: '处理中' });
-          
-          wx.cloud.callFunction({
-            name: 'guguEvent',
-            data: {
-              eventId: this.data.event._id
-            }
-          }).then(res => {
-            wx.hideLoading();
-            if (res.result.success) {
-              wx.showToast({
-                title: '已咕咕',
-                icon: 'success'
-              });
-              // 刷新页面数据
-              this.fetchEventDetails(this.data.event._id);
-
-              // 如果活动被取消，发送通知
-              if (res.result.cancelled) {
-                wx.showModal({
-                  title: '活动已取消',
-                  content: `由于超过半数参与者咕咕，活动"${this.data.event.title}"已自动取消`,
-                  showCancel: false
-                });
-              }
-            }
-          }).catch(err => {
-            console.error('咕咕失败：', err);
-            wx.hideLoading();
-            wx.showToast({
-              title: '操作失败',
-              icon: 'none'
-            });
-          });
+          this.regretEvent();
         }
       }
+    });
+  },
+
+  // 执行咕咕操作
+  regretEvent() {
+    wx.showLoading({ title: '处理中' });
+    
+    wx.cloud.callFunction({
+      name: 'guguEvent',
+      data: {
+        eventId: this.data.event._id
+      }
+    }).then(res => {
+      wx.hideLoading();
+      if (res.result.success) {
+        wx.showToast({
+          title: '已咕咕',
+          icon: 'success'
+        });
+        
+        // 刷新页面数据
+        this.fetchEventDetails(this.data.event._id);
+
+        // 刷新个人中心页面的数据
+        const profilePage = getCurrentPages().find(page => page.route === 'pages/profile/index');
+        if (profilePage) {
+          profilePage.loadUserStats();
+        }
+
+        // 如果活动被取消，发送通知
+        if (res.result.cancelled) {
+          wx.showModal({
+            title: '活动已取消',
+            content: `由于超过半数参与者咕咕，活动"${this.data.event.title}"已自动取消`,
+            showCancel: false
+          });
+        }
+      } else {
+        wx.showToast({
+          title: res.result.message || '咕咕失败',
+          icon: 'none'
+        });
+      }
+    }).catch(err => {
+      console.error('咕咕失败：', err);
+      wx.hideLoading();
+      wx.showToast({
+        title: '操作失败',
+        icon: 'none'
+      });
     });
   },
 
@@ -203,5 +246,49 @@ Page({
         }
       }
     });
+  },
+
+  onLoad(options) {
+    if (!options.id) {
+      wx.showToast({
+        title: '参数错误',
+        icon: 'none'
+      });
+      setTimeout(() => {
+        wx.switchTab({
+          url: '/pages/create/index'
+        });
+      }, 1500);
+      return;
+    }
+    this.fetchEventDetails(options.id);
+
+    // 在获取活动详情后格式化时间
+    wx.cloud.callFunction({
+      name: 'getEventDetail',
+      data: {
+        eventId: options.id
+      }
+    }).then(res => {
+      if (res.result.success) {
+        const eventDetail = res.result.data;
+        
+        // 格式化时间
+        const startTime = new Date(eventDetail.startTime);
+        const formattedStartTime = `${startTime.getFullYear()}年${startTime.getMonth() + 1}月${startTime.getDate()}日 ${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`;
+        
+        let formattedEndTime = '';
+        if (eventDetail.endTime) {
+          const endTime = new Date(eventDetail.endTime);
+          formattedEndTime = `${endTime.getFullYear()}年${endTime.getMonth() + 1}月${endTime.getDate()}日 ${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`;
+        }
+
+        this.setData({
+          eventDetail,
+          formattedStartTime,
+          formattedEndTime
+        });
+      }
+    }).catch(console.error);
   }
 }); 

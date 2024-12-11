@@ -15,11 +15,13 @@ exports.main = async (event, context) => {
     // 准备要存储的数据
     const eventData = {
       title: event.title,
-      description: event.description,
-      location: event.location,
-      maxParticipants: event.maxParticipants,
+      description: event.description || '',
+      location: event.location, // 现在包含经纬度和地址名称
+      maxParticipants: event.maxParticipants || null,
       startTime: event.startTime,
-      status: event.status,
+      endTime: event.endTime || null,
+      regretPointsRequired: event.regretPointsRequired || 1, // 新增：咕咕点数要求
+      status: 'pending',
       creatorId: wxContext.OPENID,
       participants: [wxContext.OPENID],
       createTime: db.serverDate()
@@ -33,10 +35,9 @@ exports.main = async (event, context) => {
 
     console.log('活动创建结果:', result)
 
-    // 修改返回结构，确保返回正确的 eventId
     return {
       success: true,
-      eventId: result._id  // 直接返回 _id 作为 eventId
+      eventId: result._id
     }
   } catch (err) {
     console.error('创建活动失败:', err)
