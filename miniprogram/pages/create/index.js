@@ -66,17 +66,17 @@ Page({
   // 选择地点
   chooseLocation() {
     wx.chooseLocation({
-      success: (res) => {
+      success: res => {
         this.setData({
           'formData.location': {
-            name: res.name || res.address,
+            name: res.name,
             address: res.address,
             latitude: res.latitude,
             longitude: res.longitude
           }
         });
       },
-      fail: (err) => {
+      fail: err => {
         console.error('选择地点失败:', err);
         wx.showToast({
           title: '选择地点失败',
@@ -178,7 +178,7 @@ Page({
       }
     }).catch(err => {
       wx.hideLoading();
-      console.error('创建活动失败:', err);
+      console.error('创建��动失败:', err);
       wx.showToast({
         title: '创建失败',
         icon: 'none'
@@ -188,24 +188,13 @@ Page({
 
   // 添加页面显示时的处理函数
   onShow() {
-    // 每次显示页面时重置表单数据
-    this.setData({
-      formData: {
-        title: '',
-        startDate: '',
-        startTime: '',
-        endDate: '',
-        endTime: '',
-        location: {
-          name: '',
-          latitude: null,
-          longitude: null
-        },
-        maxParticipants: '',
-        regretPointsRequired: 1,
-        description: ''
-      },
-      descriptionLength: 0
-    });
+    // 获取从地图选点页面返回的位置信息
+    const location = wx.getStorageSync('selectedLocation');
+    if (location) {
+      this.setData({
+        'formData.location': location
+      });
+      wx.removeStorageSync('selectedLocation');  // 使用后清除缓存
+    }
   }
 }); 

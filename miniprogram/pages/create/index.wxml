@@ -66,7 +66,7 @@
         <text class="label required">活动地点</text>
         <view class="location-picker" bindtap="chooseLocation">
           <text class="icon">📍</text>
-          <text class="{{formData.location.name ? '' : 'empty'}}">
+          <text class="location-text {{!formData.location.name && 'empty'}}">
             {{formData.location.name || '点击选择活动地点~'}}
           </text>
         </view>
@@ -98,7 +98,7 @@
             bindchange="onRegretPointsChange" 
           />
         </view>
-        <text class="tips">咕咕时将扣除对应点数哦~</text>
+        <text class="tips">咕咕时将扣除对应点数��~</text>
       </view>
     </view>
 

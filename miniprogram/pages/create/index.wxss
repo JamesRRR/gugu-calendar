@@ -102,6 +102,14 @@
   margin-right: 12rpx;
 }
 
+.location-text {
+  flex: 1;
+}
+
+.location-text.empty {
+  color: #999;
+}
+
 .slider-container {
   background: #fff8f8;
   border-radius: 16rpx;
