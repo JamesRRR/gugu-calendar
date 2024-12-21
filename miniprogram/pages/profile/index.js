@@ -221,34 +221,42 @@ Page({
       return;
     }
 
+    console.log('Showing action sheet with packages:', this.data.pointsPackages);
+    
     wx.showActionSheet({
       itemList: [
         '100点数 ¥648',
         '10点数 ¥128'
       ],
       success: (res) => {
+        console.log('Selected index:', res.tapIndex);
         const selectedPackage = this.data.pointsPackages[res.tapIndex];
+        console.log('Selected package:', selectedPackage);
+        
         wx.showModal({
           title: '购买点数',
           content: `确认购买 ${selectedPackage.points} 点数？价格：¥${selectedPackage.price}`,
-          success: (res) => {
-            if (res.confirm) {
+          success: (modalRes) => {
+            if (modalRes.confirm) {
               this.processPayment(selectedPackage);
             }
           }
         });
+      },
+      fail: (err) => {
+        console.error('Action sheet failed:', err);
       }
     });
   },
 
-  processPayment(package) {
+  processPayment(pointsPackage) {
     wx.showLoading({ title: '处理中' });
     
     wx.cloud.callFunction({
       name: 'createPayment',
       data: {
-        points: package.points,
-        price: package.price
+        points: pointsPackage.points,
+        price: pointsPackage.price
       }
     }).then(res => {
       wx.hideLoading();
