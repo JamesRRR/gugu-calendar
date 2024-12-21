@@ -53,7 +53,7 @@
   "lazyCodeLoading": "requiredComponents",
   "requiredBackgroundModes": ["location"],
   "requiredPrivateInfos": [
-    "chooseLocation",
+    "chooseAddress",
     "getLocation"
   ]
 } 

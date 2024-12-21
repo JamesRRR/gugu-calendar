@@ -144,4 +144,15 @@
   color: #ffb6c1;
   font-size: 28rpx;
   font-weight: normal;
+}
+
+.menu-description {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 4rpx;
+}
+
+.menu-content {
+  display: flex;
+  flex-direction: column;
 } 

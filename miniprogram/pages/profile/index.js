@@ -8,6 +8,10 @@ Page({
       completedEvents: 0,
       participationRate: '0%',
       regretPoints: 0
+    },
+    pointsPackage: {
+      points: 100,
+      price: 648
     }
   },
 
@@ -194,7 +198,7 @@ Page({
       fail: (err) => {
         console.error('Navigation failed:', err);
         wx.showToast({
-          title: '页面��转失败',
+          title: '页面跳转失败',
           icon: 'none'
         });
       }
@@ -206,5 +210,66 @@ Page({
     if (this.data.hasUserInfo) {
       this.loadUserStats();
     }
+  },
+
+  buyRegretPoints() {
+    if (!this.data.hasUserInfo) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      });
+      return;
+    }
+
+    wx.showModal({
+      title: '购买点数',
+      content: `确认购买 ${this.data.pointsPackage.points} 点数？价格：¥${this.data.pointsPackage.price}`,
+      success: (res) => {
+        if (res.confirm) {
+          this.processPayment();
+        }
+      }
+    });
+  },
+
+  processPayment() {
+    wx.showLoading({ title: '处理中' });
+    
+    wx.cloud.callFunction({
+      name: 'createPayment',
+      data: {
+        points: this.data.pointsPackage.points,
+        price: this.data.pointsPackage.price
+      }
+    }).then(res => {
+      wx.hideLoading();
+      const payment = res.result.payment;
+      
+      wx.requestPayment({
+        ...payment,
+        success: (res) => {
+          wx.showToast({
+            title: '支付成功',
+            icon: 'success'
+          });
+          // Reload user stats to show updated points
+          this.loadUserStats();
+        },
+        fail: (err) => {
+          console.error('支付失败：', err);
+          wx.showToast({
+            title: '支付失败',
+            icon: 'none'
+          });
+        }
+      });
+    }).catch(err => {
+      wx.hideLoading();
+      console.error('创建支付订单失败：', err);
+      wx.showToast({
+        title: '创建支付订单失败',
+        icon: 'none'
+      });
+    });
   }
 }); 
