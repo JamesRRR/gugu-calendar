@@ -9,10 +9,10 @@ Page({
       participationRate: '0%',
       regretPoints: 0
     },
-    pointsPackage: {
-      points: 100,
-      price: 648
-    }
+    pointsPackages: [
+      { points: 100, price: 648 },
+      { points: 10, price: 128 }
+    ]
   },
 
   onLoad() {
@@ -221,25 +221,34 @@ Page({
       return;
     }
 
-    wx.showModal({
-      title: '购买点数',
-      content: `确认购买 ${this.data.pointsPackage.points} 点数？价格：¥${this.data.pointsPackage.price}`,
+    wx.showActionSheet({
+      itemList: [
+        '100点数 ¥648',
+        '10点数 ¥128'
+      ],
       success: (res) => {
-        if (res.confirm) {
-          this.processPayment();
-        }
+        const selectedPackage = this.data.pointsPackages[res.tapIndex];
+        wx.showModal({
+          title: '购买点数',
+          content: `确认购买 ${selectedPackage.points} 点数？价格：¥${selectedPackage.price}`,
+          success: (res) => {
+            if (res.confirm) {
+              this.processPayment(selectedPackage);
+            }
+          }
+        });
       }
     });
   },
 
-  processPayment() {
+  processPayment(package) {
     wx.showLoading({ title: '处理中' });
     
     wx.cloud.callFunction({
       name: 'createPayment',
       data: {
-        points: this.data.pointsPackage.points,
-        price: this.data.pointsPackage.price
+        points: package.points,
+        price: package.price
       }
     }).then(res => {
       wx.hideLoading();
@@ -252,7 +261,6 @@ Page({
             title: '支付成功',
             icon: 'success'
           });
-          // Reload user stats to show updated points
           this.loadUserStats();
         },
         fail: (err) => {
