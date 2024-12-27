@@ -1,0 +1,54 @@
+<view class="create-container">
+  <form bindsubmit="submitForm">
+    <!-- 基本信息卡片 -->
+    <view class="form-card">
+      <view class="card-title">
+        <text class="icon">🌸</text>
+        <text>基本信息</text>
+      </view>
+      
+      <!-- 复用大部分原有的基本信息表单项 -->
+      <view class="form-item">
+        <text class="label required">活动名称</text>
+        <input 
+          class="input" 
+          name="title" 
+          placeholder="给活动起个可爱的名字吧~" 
+          value="{{formData.title}}" 
+          bindinput="onTitleInput" 
+        />
+      </view>
+
+      <!-- 其他时间选择器等基本表单项保持不变 -->
+    </view>
+
+    <!-- 收款设置卡片 -->
+    <view class="form-card">
+      <view class="card-title">
+        <text class="icon">💰</text>
+        <text>收款设置</text>
+      </view>
+
+      <view class="form-item">
+        <text class="label required">收款金额</text>
+        <input 
+          class="input" 
+          type="digit" 
+          name="paymentAmount" 
+          placeholder="请输入每人需要支付的金额" 
+          value="{{formData.paymentAmount}}"
+          bindinput="onPaymentAmountInput"
+        />
+      </view>
+      
+      <!-- 其他活动设置保持不变 -->
+    </view>
+
+    <!-- 活动详情卡片保持不变 -->
+
+    <button class="submit-btn" form-type="submit">
+      <text class="icon">🎀</text>
+      <text>创建活动</text>
+    </button>
+  </form>
+</view> 

@@ -7,43 +7,41 @@ cloud.init({
 const db = cloud.database()
 
 exports.main = async (event, context) => {
-  const wxContext = cloud.getWXContext()
+  const db = cloud.database();
   
   try {
-    console.log('接收到的活动数据:', event)
+    const { mode, paymentAmount, ...eventData } = event;
+    
+    const eventDoc = {
+      ...eventData,
+      mode: mode || 'gugu', // 默认为咕咕模式
+      creator: context.OPENID,
+      createTime: db.serverDate(),
+      participants: [context.OPENID],
+      status: 'active'
+    };
 
-    // 准备要存储的数据
-    const eventData = {
-      title: event.title,
-      description: event.description || '',
-      location: event.location, // 现在包含经纬度和地址名称
-      maxParticipants: event.maxParticipants || null,
-      startTime: event.startTime,
-      endTime: event.endTime || null,
-      regretPointsRequired: event.regretPointsRequired || 1, // 新增：咕咕点数要求
-      status: 'pending',
-      creatorId: wxContext.OPENID,
-      participants: [wxContext.OPENID],
-      createTime: db.serverDate()
+    // 根据模式添加特定字段
+    if (mode === 'payment') {
+      eventDoc.paymentAmount = paymentAmount;
+      eventDoc.paymentStatus = {};
+      eventDoc.paymentStatus[context.OPENID] = 'creator'; // 创建者无需支付
+    } else {
+      eventDoc.regretPointsRequired = event.regretPointsRequired;
     }
 
-    console.log('准备创建活动:', eventData)
-
     const result = await db.collection('events').add({
-      data: eventData
-    })
-
-    console.log('活动创建结果:', result)
+      data: eventDoc
+    });
 
     return {
       success: true,
       eventId: result._id
-    }
+    };
   } catch (err) {
-    console.error('创建活动失败:', err)
     return {
       success: false,
       message: err.message
-    }
+    };
   }
-} 
+}; 

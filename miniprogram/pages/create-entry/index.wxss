@@ -1,0 +1,52 @@
+.mode-selection-container {
+  min-height: 100vh;
+  background: #fff6f6;
+  padding: 60rpx 30rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  color: #333;
+  text-align: center;
+  margin-bottom: 60rpx;
+  font-weight: bold;
+}
+
+.mode-btn {
+  width: 100%;
+  height: 300rpx;
+  border-radius: 30rpx;
+  margin-bottom: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(255, 182, 193, 0.2);
+  border: 2rpx solid #ffe4e6;
+}
+
+.mode-icon {
+  font-size: 60rpx;
+  margin-bottom: 20rpx;
+}
+
+.mode-title {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 12rpx;
+}
+
+.mode-desc {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.gugu-mode {
+  background: linear-gradient(135deg, #fff8f8, #ffe4e6);
+}
+
+.payment-mode {
+  background: linear-gradient(135deg, #fff8f8, #e6ffe4);
+} 

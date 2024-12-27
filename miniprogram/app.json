@@ -1,7 +1,9 @@
 {
   "pages": [
+    "pages/create-entry/index",
+    "pages/create-gugu/index",
+    "pages/create-payment/index",
     "pages/profile/index",
-    "pages/create/index",
     "pages/event/detail",
     "pages/registered/registered",
     "pages/faq/index",
@@ -27,7 +29,7 @@
         "selectedIcon": "user-fill"
       },
       {
-        "pagePath": "pages/create/index",
+        "pagePath": "pages/create-entry/index",
         "text": "创建活动",
         "icon": "plus-circle",
         "selectedIcon": "plus-circle-fill"
