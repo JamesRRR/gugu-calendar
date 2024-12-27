@@ -19,7 +19,7 @@
       </view>
 
       <view class="form-item">
-        <text class="label required">开始时间</text>
+        <text class="label">开始时间（必选日期）</text>
         <view class="time-container">
           <picker mode="date" value="{{formData.startDate}}" bindchange="onStartDateChange">
             <view class="picker {{formData.startDate ? '' : 'empty'}}">
@@ -30,14 +30,14 @@
           <picker mode="time" value="{{formData.startTime}}" bindchange="onStartTimeChange">
             <view class="picker {{formData.startTime ? '' : 'empty'}}">
               <text class="icon">⏰</text>
-              <text>{{formData.startTime ? formData.startTime : '选择时间'}}</text>
+              <text>{{formData.startTime ? formData.startTime : '选择时间（可选）'}}</text>
             </view>
           </picker>
         </view>
       </view>
 
       <view class="form-item">
-        <text class="label">结束时间（可选）</text>
+        <text class="label">结束时间（必选日期）</text>
         <view class="time-container">
           <picker mode="date" value="{{formData.endDate}}" bindchange="onEndDateChange">
             <view class="picker {{formData.endDate ? '' : 'empty'}}">
@@ -48,7 +48,7 @@
           <picker mode="time" value="{{formData.endTime}}" bindchange="onEndTimeChange">
             <view class="picker {{formData.endTime ? '' : 'empty'}}">
               <text class="icon">⏰</text>
-              <text>{{formData.endTime ? formData.endTime : '选择时间'}}</text>
+              <text>{{formData.endTime ? formData.endTime : '选择时间（可选）'}}</text>
             </view>
           </picker>
         </view>
@@ -109,7 +109,7 @@
             bindinput="onTotalAmountInput"
           />
         </view>
-        <text class="tips">填写预估总价后将自动计算人均预收款金额</text>
+        <text class="tips">活动结束后将退款多余的押金</text>
       </view>
     </view>
 
