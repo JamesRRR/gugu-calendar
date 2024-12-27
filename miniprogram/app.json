@@ -59,6 +59,7 @@
   "requiredBackgroundModes": ["location"],
   "requiredPrivateInfos": [
     "chooseAddress",
-    "getLocation"
+    "getLocation",
+    "chooseLocation"
   ]
 } 

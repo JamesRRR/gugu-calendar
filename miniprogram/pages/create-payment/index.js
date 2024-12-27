@@ -19,6 +19,70 @@ Page({
     descriptionLength: 0
   },
 
+  // 处理标题输入
+  onTitleInput(e) {
+    this.setData({
+      'formData.title': e.detail.value
+    });
+  },
+
+  // 处理描述输入
+  onDescriptionInput(e) {
+    const value = e.detail.value;
+    this.setData({
+      'formData.description': value,
+      descriptionLength: value.length
+    });
+  },
+
+  // 选择地点
+  chooseLocation() {
+    wx.chooseLocation({
+      success: res => {
+        this.setData({
+          'formData.location': {
+            name: res.name,
+            address: res.address,
+            latitude: res.latitude,
+            longitude: res.longitude
+          }
+        });
+      },
+      fail: err => {
+        console.error('选择地点失败:', err);
+        wx.showToast({
+          title: '选择地点失败',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
+  // 时间选择器的处理方法
+  onStartDateChange(e) {
+    this.setData({
+      'formData.startDate': e.detail.value
+    });
+  },
+
+  onStartTimeChange(e) {
+    this.setData({
+      'formData.startTime': e.detail.value
+    });
+  },
+
+  onEndDateChange(e) {
+    this.setData({
+      'formData.endDate': e.detail.value
+    });
+  },
+
+  onEndTimeChange(e) {
+    this.setData({
+      'formData.endTime': e.detail.value
+    });
+  },
+
   // 处理总价输入
   onTotalAmountInput(e) {
     const totalAmount = e.detail.value;
