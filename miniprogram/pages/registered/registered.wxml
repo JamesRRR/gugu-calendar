@@ -2,31 +2,33 @@
   <view class="event-list">
     <view class="event-item" wx:for="{{events}}" wx:key="_id" bindtap="goToEventDetail" data-id="{{item._id}}">
       <view class="event-header">
-        <text class="event-title">🌸 {{item.title}}</text>
-        <text class="event-status {{item.status}}">{{item.statusText}}</text>
+        <text class="event-title">{{item.title}}</text>
+        <text class="event-mode {{item.mode === 'payment' ? 'payment-mode' : 'gugu-mode'}}">
+          {{item.mode === 'payment' ? '收款模式' : '咕咕模式'}}
+        </text>
       </view>
       
       <view class="event-info">
-        <!-- 时间信息 -->
-        <view class="info-row">
-          <text class="icon">🕒</text>
-          <text class="text">{{item.formattedStartTime}}</text>
+        <view class="info-item">
+          <text class="icon">📅</text>
+          <text>{{item.startTime}}</text>
         </view>
-        <view class="info-row" wx:if="{{item.formattedEndTime}}">
-          <text class="icon">⏰</text>
-          <text class="text">{{item.formattedEndTime}}</text>
-        </view>
-        
-        <!-- 地点信息 -->
-        <view class="info-row">
+        <view class="info-item">
           <text class="icon">📍</text>
-          <text class="text">{{item.location.name}}</text>
+          <text>{{item.location.name}}</text>
         </view>
         
-        <!-- 参与人数 -->
-        <view class="info-row">
-          <text class="icon">👥</text>
-          <text class="text">{{item.participants.length}}{{item.maxParticipants ? '/' + item.maxParticipants : ''}} 人参加</text>
+        <!-- 根据模式显示不同信息 -->
+        <view class="info-item" wx:if="{{item.mode === 'payment'}}">
+          <text class="icon">💰</text>
+          <text>{{item.paymentAmount}}元/人</text>
+          <text class="payment-status" wx:if="{{item.creator === userInfo._id}}">
+            (已收款: {{item.totalPayment || 0}}元)
+          </text>
+        </view>
+        <view class="info-item" wx:else>
+          <text class="icon">🎯</text>
+          <text>{{item.regretPointsRequired}}咕咕点</text>
         </view>
       </view>
     </view>
