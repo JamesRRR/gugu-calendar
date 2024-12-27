@@ -12,10 +12,47 @@ Page({
         longitude: null
       },
       maxParticipants: '',
-      paymentAmount: '', // 新增收款金额字段
+      paymentAmount: '',
+      totalAmount: '',
       description: ''
     },
     descriptionLength: 0
+  },
+
+  // 处理总价输入
+  onTotalAmountInput(e) {
+    const totalAmount = e.detail.value;
+    const maxParticipants = this.data.formData.maxParticipants;
+    
+    this.setData({
+      'formData.totalAmount': totalAmount
+    });
+    
+    // 如果设置了人数限制，自动计算人均金额
+    if (totalAmount && maxParticipants) {
+      const perPerson = (parseFloat(totalAmount) / parseInt(maxParticipants)).toFixed(2);
+      this.setData({
+        'formData.paymentAmount': perPerson
+      });
+    }
+  },
+
+  // 监听人数限制变化，重新计算人均金额
+  onMaxParticipantsInput(e) {
+    const maxParticipants = e.detail.value;
+    const totalAmount = this.data.formData.totalAmount;
+    
+    this.setData({
+      'formData.maxParticipants': maxParticipants
+    });
+    
+    // 如果设置了总价，自动计算人均金额
+    if (totalAmount && maxParticipants) {
+      const perPerson = (parseFloat(totalAmount) / parseInt(maxParticipants)).toFixed(2);
+      this.setData({
+        'formData.paymentAmount': perPerson
+      });
+    }
   },
 
   // 复用大部分原有的输入处理函数...
