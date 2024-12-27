@@ -45,6 +45,9 @@
   "permission": {
     "scope.userInfo": {
       "desc": "您的用户信息将用于小程序用户数据的展示"
+    },
+    "scope.requestPayment": {
+      "desc": "用于购买咕咕点数"
     }
   },
   "useExtendedLib": {
