@@ -90,6 +90,16 @@
   margin-bottom: 8rpx;
 }
 
+.avatar-placeholder {
+  background: #fff5f5;
+  border: 2rpx solid #ffe4e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff8c98;
+  font-size: 36rpx;
+}
+
 .participant-item .nickname {
   font-size: 24rpx;
   color: #333;

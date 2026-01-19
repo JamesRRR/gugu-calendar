@@ -18,6 +18,36 @@ async function ensureCollectionExists(name) {
   }
 }
 
+async function getOrCreateUser(openid, incomingUserInfo, requestId) {
+  const userRes = await db.collection('users').where({ _openid: openid }).get()
+  if (userRes.data && userRes.data.length > 0) return userRes.data[0]
+
+  const incoming = incomingUserInfo || {}
+  try {
+    await db.collection('users').add({
+      data: {
+        _openid: openid,
+        nickName: incoming.nickName || '匿名用户',
+        avatarUrl: incoming.avatarUrl || '',
+        regretPoints: 5,
+        createTime: db.serverDate(),
+        updateTime: db.serverDate()
+      }
+    })
+  } catch (e) {
+    logger.warn({
+      msg: 'guguEvent: create missing user failed',
+      requestId,
+      openid,
+      errCode: e && (e.errCode || e.code),
+      errMsg: e && (e.errMsg || e.message)
+    })
+  }
+
+  const retry = await db.collection('users').where({ _openid: openid }).get()
+  return (retry.data && retry.data[0]) || null
+}
+
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   const eventId = event.eventId
@@ -31,17 +61,8 @@ exports.main = async (event, context) => {
     const eventResult = await db.collection('events').doc(eventId).get()
     const eventData = eventResult.data
     
-    // 获取用户信息以检查咕咕点数
-    const userResult = await db.collection('users')
-      .where({
-        _openid: wxContext.OPENID
-      })
-      .get()
-    
-    const user = userResult.data[0]
-    if (!user) {
-      return { success: false, message: '用户不存在，请先登录', requestId }
-    }
+    const user = await getOrCreateUser(wxContext.OPENID, event && event.userInfo, requestId)
+    if (!user) return { success: false, message: '用户不存在，请先登录', requestId }
     const requiredPoints = eventData.regretPointsRequired || 1
 
     // 检查用户是否有足够的咕咕点数

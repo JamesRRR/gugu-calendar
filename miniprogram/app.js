@@ -18,6 +18,19 @@ App({
     const userInfo = wx.getStorageSync('userInfo')
     if (userInfo) {
       this.globalData.userInfo = userInfo
+
+      // 新环境迁移/首次运行时，确保云端 users 记录存在（用于咕咕/参与者头像等）
+      // 如果用户未授权头像昵称，也不会阻断正常使用
+      try {
+        wx.cloud.callFunction({
+          name: 'updateUser',
+          data: { userInfo }
+        }).catch(err => {
+          console.error('updateUser onLaunch failed:', err)
+        })
+      } catch (e) {
+        // ignore
+      }
     }
   },
   

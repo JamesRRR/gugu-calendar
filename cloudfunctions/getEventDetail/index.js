@@ -48,7 +48,17 @@ exports.main = async (event, context) => {
             _openid: _.in(eventData.participants)
           })
           .get()
-        participants = userRes.data || []
+        const users = userRes.data || []
+        const byOpenid = new Map(users.map(u => [u._openid, u]))
+        participants = eventData.participants.map(id => {
+          return (
+            byOpenid.get(id) || {
+              _openid: id,
+              nickName: '匿名用户',
+              avatarUrl: ''
+            }
+          )
+        })
       }
     } catch (e) {
       // users 集合可能不存在/无数据时不阻断详情页
@@ -58,7 +68,11 @@ exports.main = async (event, context) => {
         errCode: e && (e.errCode || e.code),
         errMsg: e && (e.errMsg || e.message)
       })
-      participants = []
+      participants = (eventData && Array.isArray(eventData.participants) ? eventData.participants : []).map(id => ({
+        _openid: id,
+        nickName: '匿名用户',
+        avatarUrl: ''
+      }))
     }
 
     return {

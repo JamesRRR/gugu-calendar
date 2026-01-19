@@ -39,11 +39,13 @@
       <text class="section-title">参与者</text>
       <view class="participants-list">
         <view class="participant-item" wx:for="{{participants}}" wx:key="_openid">
-          <image 
-            class="avatar" 
-            src="{{item.avatarUrl || '/images/default-avatar.png'}}"
+          <image
+            wx:if="{{item.avatarUrl}}"
+            class="avatar"
+            src="{{item.avatarUrl}}"
             mode="aspectFill"
           />
+          <view wx:else class="avatar avatar-placeholder">👤</view>
           <text class="nickname">{{item.nickName || '匿名用户'}}</text>
           <text class="creator-tag" wx:if="{{item._openid === event.creator}}">创建者</text>
         </view>

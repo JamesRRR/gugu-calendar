@@ -187,11 +187,17 @@ Page({
   // 执行咕咕操作
   regretEvent() {
     wx.showLoading({ title: '处理中' });
-    
+    const localUserInfo = wx.getStorageSync('userInfo') || {}
+
     wx.cloud.callFunction({
       name: 'guguEvent',
       data: {
-        eventId: this.data.event._id
+        eventId: this.data.event._id,
+        // 用于新环境 users 记录缺失时自动补齐
+        userInfo: {
+          nickName: localUserInfo.nickName,
+          avatarUrl: localUserInfo.avatarUrl
+        }
       }
     }).then(res => {
       wx.hideLoading();
