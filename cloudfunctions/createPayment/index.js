@@ -7,9 +7,22 @@ exports.main = async (event, context) => {
   // Get both OPENID and ENV from context
   const { OPENID, ENV } = cloud.getWXContext();
   const { points, price } = event;
+  const requestId = context && (context.requestId || context.requestID);
+  const logger = cloud.logger ? cloud.logger() : console
 
   try {
     const db = cloud.database();
+
+    async function ensureCollectionExists(name) {
+      try {
+        if (typeof db.createCollection === 'function') {
+          await db.createCollection(name);
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    await ensureCollectionExists('orders')
     
     // Create order in database
     const order = {
@@ -20,9 +33,19 @@ exports.main = async (event, context) => {
       createTime: db.serverDate()
     };
     
-    const orderResult = await db.collection('orders').add({
-      data: order
-    });
+    let orderResult;
+    try {
+      orderResult = await db.collection('orders').add({ data: order });
+    } catch (err) {
+      const errCode = err && (err.errCode || err.code);
+      const errMsg = err && (err.errMsg || err.message);
+      if (errCode === -502005 || (typeof errMsg === 'string' && errMsg.includes('DATABASE_COLLECTION_NOT_EXIST'))) {
+        await ensureCollectionExists('orders');
+        orderResult = await db.collection('orders').add({ data: order });
+      } else {
+        throw err;
+      }
+    }
 
     // Generate timestamp and nonceStr
     const timeStamp = Math.floor(Date.now() / 1000).toString();
@@ -54,6 +77,7 @@ exports.main = async (event, context) => {
 
       return {
         success: true,
+        requestId,
         payment: payment
       };
     } else {
@@ -61,14 +85,24 @@ exports.main = async (event, context) => {
       return {
         success: false,
         error: res,
+        requestId,
         message: res.errCodeDes || res.returnMsg
       };
     }
   } catch (err) {
-    console.error('Payment creation error:', err);
+    logger.error({
+      msg: 'createPayment: failed',
+      requestId,
+      openid: OPENID,
+      errCode: err && (err.errCode || err.code),
+      errMsg: err && (err.errMsg || err.message),
+      stack: err && err.stack
+    });
     return {
       success: false,
-      error: err
+      error: err,
+      requestId,
+      message: (err && (err.errMsg || err.message)) || '创建支付订单失败'
     };
   }
 }; 

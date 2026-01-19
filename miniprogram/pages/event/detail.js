@@ -3,25 +3,29 @@ Page({
     event: null,
     isCreator: false,
     hasJoined: false,
-    eventDetail: null,
     formattedStartTime: '',
-    formattedEndTime: ''
+    formattedEndTime: '',
+    participants: []
+  },
+
+  getEnvVersion() {
+    try {
+      return wx.getAccountInfoSync().miniProgram.envVersion; // develop | trial | release
+    } catch (e) {
+      return 'release';
+    }
   },
 
   onLoad(options) {
-    if (!options.id) {
-      wx.showToast({
-        title: '参数错误',
-        icon: 'none'
-      });
+    const id = options && options.id;
+    if (!id) {
+      wx.showToast({ title: '参数错误', icon: 'none' });
       setTimeout(() => {
-        wx.switchTab({
-          url: '/pages/create/index'
-        });
+        wx.switchTab({ url: '/pages/registered/registered' });
       }, 1500);
       return;
     }
-    this.fetchEventDetails(options.id);
+    this.fetchEventDetails(id);
   },
 
   fetchEventDetails(eventId) {
@@ -30,67 +34,59 @@ Page({
     wx.showLoading({
       title: '加载中...',
     });
-
-    const db = wx.cloud.database();
-    
-    // 首先获取活动信息
-    db.collection('events')
-      .doc(eventId)
-      .get()
-      .then(res => {
-        console.log('活动数据:', res.data);
-        const event = res.data;
-        const userInfo = getApp().globalData.userInfo;
-        
-        // 格式化时间
-        const startTime = new Date(event.startTime);
-        const formattedStartTime = `${startTime.getFullYear()}年${startTime.getMonth() + 1}月${startTime.getDate()}日 ${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`;
-        
-        let formattedEndTime = '';
-        if (event.endTime) {
-          const endTime = new Date(event.endTime);
-          formattedEndTime = `${endTime.getFullYear()}年${endTime.getMonth() + 1}月${endTime.getDate()}日 ${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`;
+    wx.cloud.callFunction({
+      name: 'getEventDetail',
+      data: { eventId }
+    }).then(res => {
+      wx.hideLoading();
+      if (!res.result || !res.result.success) {
+        console.error('getEventDetail failed:', res);
+        const envVersion = this.getEnvVersion();
+        if (envVersion === 'develop' || envVersion === 'trial') {
+          wx.showModal({
+            title: '加载失败（调试信息）',
+            content: JSON.stringify(res.result || res, null, 2).slice(0, 1800),
+            showCancel: false
+          });
         }
+        wx.showToast({ title: (res.result && res.result.message) || '加载失败', icon: 'none' });
+        return;
+      }
 
-        const isCreator = event.creatorId === userInfo.openId;
-        const hasJoined = Array.isArray(event.participants) && 
-                         event.participants.includes(userInfo.openId);
+      const event = res.result.data;
+      const participants = res.result.participants || [];
 
-        this.setData({
-          event,
-          isCreator,
-          hasJoined,
-          formattedStartTime,
-          formattedEndTime
-        });
+      // 格式化时间
+      const startTime = new Date(event.startTime);
+      const formattedStartTime = `${startTime.getFullYear()}年${startTime.getMonth() + 1}月${startTime.getDate()}日 ${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`;
 
-        // 获取所有参与者的用户信息
-        if (event.participants && event.participants.length > 0) {
-          db.collection('users')
-            .where({
-              _openid: db.command.in(event.participants)
-            })
-            .get()
-            .then(userRes => {
-              this.setData({
-                participants: userRes.data
-              });
-            })
-            .catch(err => {
-              console.error('获取参与者信息失败：', err);
-            });
-        }
+      let formattedEndTime = '';
+      if (event.endTime) {
+        const endTime = new Date(event.endTime);
+        formattedEndTime = `${endTime.getFullYear()}年${endTime.getMonth() + 1}月${endTime.getDate()}日 ${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`;
+      }
 
-        wx.hideLoading();
-      })
-      .catch(err => {
-        console.error('获取活动详情失败：', err);
-        wx.hideLoading();
-        wx.showToast({
-          title: '加载失败',
-          icon: 'none'
-        });
+      this.setData({
+        event,
+        participants,
+        isCreator: !!res.result.isCreator,
+        hasJoined: !!res.result.hasJoined,
+        formattedStartTime,
+        formattedEndTime
       });
+    }).catch(err => {
+      console.error('获取活动详情失败：', err);
+      wx.hideLoading();
+      const envVersion = this.getEnvVersion();
+      if (envVersion === 'develop' || envVersion === 'trial') {
+        wx.showModal({
+          title: '加载失败（调试信息）',
+          content: JSON.stringify(err, Object.getOwnPropertyNames(err), 2).slice(0, 1800),
+          showCancel: false
+        });
+      }
+      wx.showToast({ title: '加载失败', icon: 'none' });
+    });
   },
 
   // 分享配置
@@ -101,6 +97,33 @@ Page({
       path: `/pages/event/detail?id=${event._id}`,
       imageUrl: '/images/share-cover.png'
     };
+  },
+
+  // 加入活动
+  joinEvent() {
+    const event = this.data.event;
+    if (!event || !event._id) return;
+
+    wx.showLoading({ title: '加入中' });
+    wx.cloud.callFunction({
+      name: 'joinEvent',
+      data: { eventId: event._id }
+    }).then(res => {
+      wx.hideLoading();
+      if (res.result && res.result.success) {
+        wx.showToast({ title: '已加入', icon: 'success' });
+        this.fetchEventDetails(event._id);
+      } else {
+        wx.showToast({
+          title: (res.result && res.result.message) || '加入失败',
+          icon: 'none'
+        });
+      }
+    }).catch(err => {
+      console.error('加入活动失败：', err);
+      wx.hideLoading();
+      wx.showToast({ title: '加入失败', icon: 'none' });
+    });
   },
 
   // 退出活动
@@ -211,84 +234,4 @@ Page({
     });
   },
 
-  // 取消活动
-  cancelEvent() {
-    wx.showModal({
-      title: '确认取消',
-      content: '确定要取消这个活动吗？',
-      success: (res) => {
-        if (res.confirm) {
-          wx.showLoading({ title: '处理中' });
-          
-          wx.cloud.callFunction({
-            name: 'cancelEvent',
-            data: {
-              eventId: this.data.event._id
-            }
-          }).then(res => {
-            wx.hideLoading();
-            if (res.result.success) {
-              wx.showToast({
-                title: '已取消活动',
-                icon: 'success'
-              });
-              // 刷新页面数据
-              this.fetchEventDetails(this.data.event._id);
-            }
-          }).catch(err => {
-            console.error('取消活动失败：', err);
-            wx.hideLoading();
-            wx.showToast({
-              title: '操作失败',
-              icon: 'none'
-            });
-          });
-        }
-      }
-    });
-  },
-
-  onLoad(options) {
-    if (!options.id) {
-      wx.showToast({
-        title: '参数错误',
-        icon: 'none'
-      });
-      setTimeout(() => {
-        wx.switchTab({
-          url: '/pages/create/index'
-        });
-      }, 1500);
-      return;
-    }
-    this.fetchEventDetails(options.id);
-
-    // 在获取活动详情后格式化时间
-    wx.cloud.callFunction({
-      name: 'getEventDetail',
-      data: {
-        eventId: options.id
-      }
-    }).then(res => {
-      if (res.result.success) {
-        const eventDetail = res.result.data;
-        
-        // 格式化时间
-        const startTime = new Date(eventDetail.startTime);
-        const formattedStartTime = `${startTime.getFullYear()}年${startTime.getMonth() + 1}月${startTime.getDate()}日 ${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`;
-        
-        let formattedEndTime = '';
-        if (eventDetail.endTime) {
-          const endTime = new Date(eventDetail.endTime);
-          formattedEndTime = `${endTime.getFullYear()}年${endTime.getMonth() + 1}月${endTime.getDate()}日 ${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`;
-        }
-
-        this.setData({
-          eventDetail,
-          formattedStartTime,
-          formattedEndTime
-        });
-      }
-    }).catch(console.error);
-  }
 }); 

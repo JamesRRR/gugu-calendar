@@ -2,6 +2,7 @@
   min-height: 100vh;
   background: #fff6f6;
   padding: 60rpx 30rpx;
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
 }
 
 .title {

@@ -15,7 +15,14 @@ Page({
     ]
   },
 
+  setTabSelected() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 2 });
+    }
+  },
+
   onLoad() {
+    this.setTabSelected();
     // 尝试从本地存储获取用户信息
     const userInfo = wx.getStorageSync('userInfo');
     if (userInfo) {
@@ -206,6 +213,7 @@ Page({
   },
 
   onShow() {
+    this.setTabSelected();
     // 每次页面显示时刷新用户统计信息
     if (this.data.hasUserInfo) {
       this.loadUserStats();

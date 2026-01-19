@@ -21,6 +21,13 @@
   padding: 5px 0;
 }
 
-.tab-bar-item icon {
-  margin-bottom: 3px;
-} 
+.tab-icon {
+  font-size: 22px;
+  line-height: 22px;
+  margin-bottom: 2px;
+}
+
+.tab-text {
+  font-size: 10px;
+  line-height: 12px;
+}

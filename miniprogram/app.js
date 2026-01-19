@@ -9,7 +9,7 @@ App({
       console.error('请使用 2.2.3 或以上的基础库以使用云能力')
     } else {
       wx.cloud.init({
-        env: 'gugu-calender-2-4gc2cjwf8054ba71',
+        env: 'cloud1-7g9ukzn1692197af',
         traceUser: true
       })
     }
@@ -28,7 +28,7 @@ App({
   onPageNotFound: function(res) {
     console.error('Page not found:', res);
     wx.switchTab({
-      url: '/pages/index/index'
+      url: '/pages/registered/registered'
     });
   },
 

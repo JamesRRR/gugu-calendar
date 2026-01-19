@@ -2,6 +2,7 @@
   min-height: 100vh;
   background: #fff6f6;
   padding: 30rpx;
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
 }
 
 .form-card {
@@ -172,3 +173,37 @@
 .submit-btn::after {
   border: none;
 } 
+
+.subpage-footer-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 110rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #ffffff;
+  border-top: 2rpx solid #ffe4e6;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 999;
+}
+
+.subpage-footer-nav .nav-item {
+  flex: 1;
+  height: 110rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #999999;
+  font-size: 22rpx;
+}
+
+.subpage-footer-nav .nav-item text {
+  margin-top: 6rpx;
+}
+
+.subpage-footer-nav .nav-item.active {
+  color: #07c160;
+}

@@ -7,6 +7,11 @@ Page({
   },
 
   onShow() {
+    // 自定义 tabBar 高亮
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 0 });
+    }
+
     // 获取用户信息
     const userInfo = wx.getStorageSync('userInfo');
     this.setData({ userInfo });
@@ -15,12 +20,14 @@ Page({
 
   loadEvents() {
     wx.showLoading({ title: '加载中' });
+    console.log('Loading events...');
     wx.cloud.callFunction({
       name: 'getRegisteredEvents',
       data: {
         mode: 'all'
       }
     }).then(res => {
+      console.log('Got events response:', res);
       if (res.result.success) {
         // 处理时间格式和计算收款总额
         const events = res.result.events.map(event => {
@@ -35,12 +42,13 @@ Page({
           
           // 计算收款模式的总金额
           if (event.mode === 'payment') {
-            event.totalPayment = (event.participants?.length || 0) * event.paymentAmount;
+            event.totalPayment = event.totalPaid || 0;
           }
           
           return event;
         });
         
+        console.log('Processed events:', events);
         this.setData({ events });
       }
       wx.hideLoading();

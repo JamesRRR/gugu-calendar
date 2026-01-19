@@ -19,6 +19,32 @@ Page({
     descriptionLength: 0
   },
 
+  goToTab(e) {
+    const index = Number(e && e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.index);
+    const tabMap = {
+      0: '/pages/registered/registered',
+      1: '/pages/create-entry/index',
+      2: '/pages/profile/index'
+    };
+    const url = tabMap[index] || tabMap[1];
+    wx.switchTab({ url });
+  },
+
+  getEnvVersion() {
+    try {
+      return wx.getAccountInfoSync().miniProgram.envVersion; // develop | trial | release
+    } catch (e) {
+      return 'release';
+    }
+  },
+
+  // iOS 兼容：iOS 不支持 "YYYY-MM-DD HH:mm"
+  toTimestamp(dateStr, timeStr, fallbackTime) {
+    const normalized = `${dateStr} ${timeStr || fallbackTime}`.replace(/-/g, '/');
+    const ts = new Date(normalized).getTime();
+    return ts;
+  },
+
   // 处理标题输入
   onTitleInput(e) {
     this.setData({
@@ -155,16 +181,16 @@ Page({
     }
 
     // 验证地点
-    if (!formData.location.name) {
+    // 处理时间格式
+    const startTime = this.toTimestamp(formData.startDate, formData.startTime, '00:00');
+    const endTime = this.toTimestamp(formData.endDate, formData.endTime, '23:59');
+
+    if (Number.isNaN(startTime) || Number.isNaN(endTime)) {
       return wx.showToast({
-        title: '请选择活动地点',
+        title: '时间格式不正确',
         icon: 'none'
       });
     }
-
-    // 处理时间格式
-    const startDateTime = formData.startDate + ' ' + (formData.startTime || '00:00');
-    const endDateTime = formData.endDate + ' ' + (formData.endTime || '23:59');
 
     // 调用云函数创建收款模式活动
     wx.showLoading({ title: '创建中' });
@@ -172,9 +198,10 @@ Page({
       name: 'createEvent',
       data: {
         title: formData.title,
-        startTime: new Date(startDateTime).getTime(),
-        endTime: new Date(endDateTime).getTime(),
-        location: formData.location,
+        startTime,
+        endTime,
+        // 地点可选：未填写时写入 null
+        location: (formData.location && formData.location.name) ? formData.location : null,
         maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : null,
         description: formData.description,
         mode: 'payment',
@@ -198,11 +225,29 @@ Page({
           });
         }, 2000);
       } else {
-        throw new Error(res.result.message || '创建失败');
+        console.error('createEvent failed:', res);
+        const envVersion = this.getEnvVersion();
+        if (envVersion === 'develop' || envVersion === 'trial') {
+          const detail = res && res.result && (res.result.error || res.result);
+          wx.showModal({
+            title: '创建失败（调试信息）',
+            content: JSON.stringify(detail, null, 2).slice(0, 1800),
+            showCancel: false
+          });
+        }
+        throw new Error((res && res.result && res.result.message) || '创建失败');
       }
     }).catch(err => {
       console.error('创建活动失败:', err);
       wx.hideLoading();
+      const envVersion = this.getEnvVersion();
+      if (envVersion === 'develop' || envVersion === 'trial') {
+        wx.showModal({
+          title: '创建失败（调试信息）',
+          content: JSON.stringify(err, Object.getOwnPropertyNames(err), 2).slice(0, 1800),
+          showCancel: false
+        });
+      }
       wx.showToast({
         title: err.message || '创建失败，请重试',
         icon: 'none',

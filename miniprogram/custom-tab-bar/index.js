@@ -4,20 +4,20 @@ Component({
     color: "#999999",
     selectedColor: "#07c160",
     list: [{
-      pagePath: "pages/event/create",
-      text: "创建",
-      iconType: "add",
-      selectedIconType: "add"
+      pagePath: "pages/registered/registered",
+      text: "已注册",
+      iconText: "📋",
+      selectedIconText: "📋"
     }, {
-      pagePath: "pages/event/list",
-      text: "活动",
-      iconType: "waiting",
-      selectedIconType: "waiting"
+      pagePath: "pages/create-entry/index",
+      text: "创建活动",
+      iconText: "➕",
+      selectedIconText: "➕"
     }, {
       pagePath: "pages/profile/index",
       text: "我的",
-      iconType: "personal",
-      selectedIconType: "personal"
+      iconText: "👤",
+      selectedIconText: "👤"
     }]
   },
   methods: {

@@ -6,12 +6,27 @@ cloud.init({
 
 const db = cloud.database()
 const _ = db.command
+const logger = cloud.logger ? cloud.logger() : console
+
+async function ensureCollectionExists(name) {
+  try {
+    if (typeof db.createCollection === 'function') {
+      await db.createCollection(name)
+    }
+  } catch (e) {
+    // ignore
+  }
+}
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   const eventId = event.eventId
+  const requestId = context && (context.requestId || context.requestID)
   
   try {
+    await ensureCollectionExists('events')
+    await ensureCollectionExists('users')
+
     // 获取活动信息
     const eventResult = await db.collection('events').doc(eventId).get()
     const eventData = eventResult.data
@@ -24,6 +39,9 @@ exports.main = async (event, context) => {
       .get()
     
     const user = userResult.data[0]
+    if (!user) {
+      return { success: false, message: '用户不存在，请先登录', requestId }
+    }
     const requiredPoints = eventData.regretPointsRequired || 1
 
     // 检查用户是否有足够的咕咕点数
@@ -81,7 +99,8 @@ exports.main = async (event, context) => {
       return {
         success: true,
         cancelled,
-        message: '咕咕成功'
+        message: '咕咕成功',
+        requestId
       }
     } catch (err) {
       // 如果事务执行失败，回滚所有操作
@@ -89,10 +108,18 @@ exports.main = async (event, context) => {
       throw err
     }
   } catch (err) {
-    console.error('咕咕失败:', err)
+    logger.error({
+      msg: 'guguEvent: failed',
+      requestId,
+      openid: wxContext.OPENID,
+      errCode: err && (err.errCode || err.code),
+      errMsg: err && (err.errMsg || err.message),
+      stack: err && err.stack
+    })
     return {
       success: false,
-      message: err.message
+      message: (err && (err.errMsg || err.message)) || '咕咕失败',
+      requestId
     }
   }
 } 
