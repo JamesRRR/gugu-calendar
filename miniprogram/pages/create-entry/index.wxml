@@ -1,0 +1,15 @@
+<view class="mode-selection-container">
+  <view class="title">选择活动模式</view>
+  
+  <button class="mode-btn gugu-mode" bindtap="navigateToGuguMode">
+    <view class="mode-icon">🕊️</view>
+    <view class="mode-title">咕咕模式</view>
+    <view class="mode-desc">使用咕咕点数作为信用担保</view>
+  </button>
+
+  <button class="mode-btn payment-mode" bindtap="navigateToPaymentMode">
+    <view class="mode-icon">💰</view>
+    <view class="mode-title">收款模式</view>
+    <view class="mode-desc">参与者需要支付固定金额</view>
+  </button>
+</view> 

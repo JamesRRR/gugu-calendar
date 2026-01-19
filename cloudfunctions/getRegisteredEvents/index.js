@@ -5,52 +5,65 @@ cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
 })
 
-const db = cloud.database()
-const _ = db.command
-
-// 云函数入口函数
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
-  const openid = wxContext.OPENID
+  const db = cloud.database()
+  const _ = db.command
+  const logger = cloud.logger ? cloud.logger() : console
 
-  try {
-    // 先获取用户的报名记录
-    const registrations = await db.collection('registrations')
-      .where({
-        userId: openid  // 使用openid作为用户标识
-      })
-      .get()
-
-    // 如果没有报名记录，直接返回空数组
-    if (!registrations.data || registrations.data.length === 0) {
-      return {
-        data: [],
-        errMsg: 'ok'
+  async function ensureCollectionExists(name) {
+    try {
+      if (typeof db.createCollection === 'function') {
+        await db.createCollection(name)
       }
+    } catch (e) {
+      // ignore
     }
+  }
+  
+  try {
+    await ensureCollectionExists('events')
 
-    // 获取所有已报名活动的ID
-    const eventIds = registrations.data.map(reg => reg.eventId)
-
-    // 查询这些活动的详细信息
-    const events = await db.collection('events')
-      .where({
-        _id: _.in(eventIds)
-      })
-      .orderBy('startTime', 'desc')  // 按开始时间倒序排列
+    // 查询用户参与的所有活动
+    const result = await db.collection('events')
+      // 查询用户是参与者或创建者的活动（participants 是数组字段）
+      .where(_.or([
+        { participants: _.all([wxContext.OPENID]) },
+        { creator: _.eq(wxContext.OPENID) }
+      ]))
+      .orderBy('createTime', 'desc')
       .get()
 
-    // 返回活动信息
-    return {
-      data: events.data,
-      errMsg: 'ok'
-    }
+    // 打印日志，方便调试
+    console.log('Found events:', result.data);
 
-  } catch (err) {
-    console.error(err)
     return {
-      data: [],
-      errMsg: err
+      success: true,
+      events: result.data.map(event => {
+        return {
+          ...event,
+          participants: Array.isArray(event.participants) ? event.participants.filter(p => p != null) : [],
+          paymentStatus: event.paymentStatus || {}
+        };
+      })
+    };
+  } catch (err) {
+    // events 集合不存在时，直接返回空列表，避免前端报错
+    const errCode = err && (err.errCode || err.code)
+    const errMsg = err && (err.errMsg || err.message)
+    if (errCode === -502005 || (typeof errMsg === 'string' && errMsg.includes('DATABASE_COLLECTION_NOT_EXIST'))) {
+      logger.warn({
+        msg: 'getRegisteredEvents: events collection missing',
+        openid: wxContext.OPENID,
+        errCode,
+        errMsg
+      })
+      return { success: true, events: [] }
+    }
+    console.error('获取已注册活动失败:', err)
+    return {
+      success: false,
+      message: err.message || '获取活动列表失败'
     }
   }
 } 

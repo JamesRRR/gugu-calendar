@@ -8,10 +8,21 @@ Page({
       completedEvents: 0,
       participationRate: '0%',
       regretPoints: 0
+    },
+    pointsPackages: [
+      { points: 100, price: 648 },
+      { points: 10, price: 128 }
+    ]
+  },
+
+  setTabSelected() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 2 });
     }
   },
 
   onLoad() {
+    this.setTabSelected();
     // 尝试从本地存储获取用户信息
     const userInfo = wx.getStorageSync('userInfo');
     if (userInfo) {
@@ -194,7 +205,7 @@ Page({
       fail: (err) => {
         console.error('Navigation failed:', err);
         wx.showToast({
-          title: '页面��转失败',
+          title: '页面跳转失败',
           icon: 'none'
         });
       }
@@ -202,9 +213,87 @@ Page({
   },
 
   onShow() {
+    this.setTabSelected();
     // 每次页面显示时刷新用户统计信息
     if (this.data.hasUserInfo) {
       this.loadUserStats();
     }
+  },
+
+  buyRegretPoints() {
+    if (!this.data.hasUserInfo) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      });
+      return;
+    }
+
+    console.log('Showing action sheet with packages:', this.data.pointsPackages);
+    
+    wx.showActionSheet({
+      itemList: [
+        '100点数 ¥648',
+        '10点数 ¥128'
+      ],
+      success: (res) => {
+        console.log('Selected index:', res.tapIndex);
+        const selectedPackage = this.data.pointsPackages[res.tapIndex];
+        console.log('Selected package:', selectedPackage);
+        
+        wx.showModal({
+          title: '购买点数',
+          content: `确认购买 ${selectedPackage.points} 点数？价格：¥${selectedPackage.price}`,
+          success: (modalRes) => {
+            if (modalRes.confirm) {
+              this.processPayment(selectedPackage);
+            }
+          }
+        });
+      },
+      fail: (err) => {
+        console.error('Action sheet failed:', err);
+      }
+    });
+  },
+
+  processPayment(pointsPackage) {
+    wx.showLoading({ title: '处理中' });
+    
+    wx.cloud.callFunction({
+      name: 'createPayment',
+      data: {
+        points: pointsPackage.points,
+        price: pointsPackage.price
+      }
+    }).then(res => {
+      wx.hideLoading();
+      const payment = res.result.payment;
+      
+      wx.requestPayment({
+        ...payment,
+        success: (res) => {
+          wx.showToast({
+            title: '支付成功',
+            icon: 'success'
+          });
+          this.loadUserStats();
+        },
+        fail: (err) => {
+          console.error('支付失败：', err);
+          wx.showToast({
+            title: '支付失败',
+            icon: 'none'
+          });
+        }
+      });
+    }).catch(err => {
+      wx.hideLoading();
+      console.error('创建支付订单失败：', err);
+      wx.showToast({
+        title: '创建支付订单失败',
+        icon: 'none'
+      });
+    });
   }
 }); 

@@ -1,0 +1,266 @@
+.create-container {
+  min-height: 100vh;
+  background: #f6fff8;  /* 使用浅绿色背景 */
+  padding: 30rpx;
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+}
+
+.form-card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(182, 255, 193, 0.2);  /* 绿色阴影 */
+  border: 2rpx solid #e4ffe6;  /* 绿色边框 */
+  margin-bottom: 30rpx;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  font-size: 32rpx;
+  color: #07c160;  /* 使用绿色主题 */
+  font-weight: 600;
+  margin-bottom: 30rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx dashed #e4ffe6;
+}
+
+.card-title .icon {
+  margin-right: 16rpx;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-item:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+}
+
+.required::after {
+  content: '*';
+  color: #07c160;  /* 使用绿色星号 */
+  margin-left: 8rpx;
+}
+
+.input {
+  width: 100%;
+  height: 88rpx;
+  background: #f8fff8;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #333;
+  border: 2rpx solid #e4ffe6;
+}
+
+.time-container {
+  display: flex;
+  gap: 20rpx;
+}
+
+.picker {
+  flex: 1;
+  height: 88rpx;
+  background: #f8fff8;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #333;
+  border: 2rpx solid #e4ffe6;
+  display: flex;
+  align-items: center;
+}
+
+.picker .icon {
+  margin-right: 12rpx;
+}
+
+.empty {
+  color: #999;
+}
+
+.location-picker {
+  height: 88rpx;
+  background: #f8fff8;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #333;
+  border: 2rpx solid #e4ffe6;
+  display: flex;
+  align-items: center;
+}
+
+.location-picker .icon {
+  margin-right: 12rpx;
+}
+
+.location-text {
+  flex: 1;
+}
+
+.location-text.empty {
+  color: #999;
+}
+
+/* 特别优化收款金额输入框 */
+.payment-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.payment-input::before {
+  content: '¥';
+  position: absolute;
+  left: 24rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #07c160;
+  font-weight: bold;
+}
+
+.subpage-footer-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 110rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #ffffff;
+  border-top: 2rpx solid #e4ffe6;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 999;
+}
+
+.subpage-footer-nav .nav-item {
+  flex: 1;
+  height: 110rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #999999;
+  font-size: 22rpx;
+}
+
+.subpage-footer-nav .nav-item text {
+  margin-top: 6rpx;
+}
+
+.subpage-footer-nav .nav-item.active {
+  color: #07c160;
+}
+
+.payment-input input {
+  padding-left: 48rpx;
+}
+
+.textarea {
+  width: 100%;
+  height: 200rpx;
+  background: #f8fff8;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+  color: #333;
+  border: 2rpx solid #e4ffe6;
+}
+
+.word-count {
+  text-align: right;
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 12rpx;
+  padding-right: 24rpx;
+}
+
+.submit-btn {
+  width: 90%;
+  height: 88rpx;
+  background: linear-gradient(135deg, #07c160, #10d873);  /* 渐变绿色按钮 */
+  border-radius: 44rpx;
+  color: #fff;
+  font-size: 32rpx;
+  margin-top: 60rpx;
+  margin-bottom: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: 0 6rpx 20rpx rgba(7, 193, 96, 0.3);  /* 绿色阴影 */
+  transition: transform 0.2s;
+}
+
+.submit-btn:active {
+  transform: scale(0.98);
+}
+
+.submit-btn .icon {
+  margin-right: 12rpx;
+}
+
+.submit-btn::after {
+  border: none;
+}
+
+/* 可爱的输入框焦点效果 */
+.input:focus,
+.textarea:focus {
+  border-color: #07c160;
+  box-shadow: 0 0 8rpx rgba(7, 193, 96, 0.2);
+}
+
+/* 添加一些可爱的动画效果 */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2rpx); }
+}
+
+.card-title .icon {
+  animation: bounce 2s infinite ease-in-out;
+}
+
+/* 输入框的可爱提示样式 */
+.tips {
+  font-size: 24rpx;
+  color: #07c160;
+  margin-top: 12rpx;
+  padding-left: 24rpx;
+  display: flex;
+  align-items: center;
+}
+
+.tips::before {
+  content: '💡';
+  margin-right: 8rpx;
+}
+
+/* 优化支付金额输入框 */
+.payment-input {
+  position: relative;
+}
+
+.payment-input .input {
+  padding-left: 48rpx;  /* 为人民币符号留出空间 */
+}
+
+.payment-input::before {
+  content: '¥';
+  position: absolute;
+  left: 24rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #07c160;
+  font-weight: bold;
+} 

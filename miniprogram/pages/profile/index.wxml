@@ -37,6 +37,11 @@
 
   <!-- 功能按钮 -->
   <view class="action-list">
+    <view class="action-item" bindtap="buyRegretPoints">
+      <text class="icon">💰</text>
+      <text class="text">购买点数</text>
+      <text class="arrow">❯</text>
+    </view>
     <view class="action-item" bindtap="goToFAQ">
       <text class="icon">💝</text>
       <text class="text">常见问题</text>

@@ -1,9 +1,11 @@
 {
   "pages": [
-    "pages/profile/index",
-    "pages/create/index",
-    "pages/event/detail",
     "pages/registered/registered",
+    "pages/profile/index",
+    "pages/create-entry/index",
+    "pages/create-gugu/index",
+    "pages/create-payment/index",
+    "pages/event/detail",
     "pages/faq/index",
     "pages/intro/index"
   ],
@@ -14,46 +16,36 @@
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
-    "custom": false,
+    "custom": true,
     "color": "#999999",
     "selectedColor": "#07c160",
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
       {
-        "pagePath": "pages/profile/index",
-        "text": "我的",
-        "icon": "user",
-        "selectedIcon": "user-fill"
-      },
-      {
-        "pagePath": "pages/create/index",
-        "text": "创建活动",
-        "icon": "plus-circle",
-        "selectedIcon": "plus-circle-fill"
-      },
-      {
         "pagePath": "pages/registered/registered",
-        "text": "已注册",
-        "icon": "calendar",
-        "selectedIcon": "calendar-fill"
+        "text": "已注册"
+      },
+      {
+        "pagePath": "pages/create-entry/index",
+        "text": "创建活动"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的"
       }
     ]
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
-  "permission": {
-    "scope.userInfo": {
-      "desc": "您的用户信息将用于小程序用户数据的展示"
-    }
-  },
   "useExtendedLib": {
     "weui": true
   },
   "lazyCodeLoading": "requiredComponents",
   "requiredBackgroundModes": ["location"],
   "requiredPrivateInfos": [
-    "chooseLocation",
-    "getLocation"
+    "chooseAddress",
+    "getLocation",
+    "chooseLocation"
   ]
 } 

@@ -97,4 +97,32 @@
   content: '🎀';
   font-size: 80rpx;
   margin-bottom: 20rpx;
+}
+
+.event-mode {
+  font-size: 24rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  margin-left: 16rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  height: 44rpx;
+}
+
+.payment-mode {
+  background: #e6ffe4;
+  color: #07c160;
+}
+
+.gugu-mode {
+  background: #ffe4e6;
+  color: #ff8c98;
+}
+
+.payment-status {
+  font-size: 24rpx;
+  color: #07c160;
+  margin-left: 8rpx;
 } 

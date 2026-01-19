@@ -2,67 +2,76 @@ const app = getApp()
 
 Page({
   data: {
-    events: []
+    events: [],
+    userInfo: null
   },
 
   onShow() {
+    // 自定义 tabBar 高亮
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 0 });
+    }
+
+    // 获取用户信息
+    const userInfo = wx.getStorageSync('userInfo');
+    this.setData({ userInfo });
     this.loadEvents();
   },
 
   loadEvents() {
-    const userInfo = getApp().globalData.userInfo;
-    if (!userInfo || !userInfo.openId) return;
-
     wx.showLoading({ title: '加载中' });
-
-    const db = wx.cloud.database();
-    db.collection('events')
-      .where({
-        participants: userInfo.openId
-      })
-      .orderBy('startTime', 'asc')  // 按开始时间升序排序
-      .get()
-      .then(res => {
-        const events = res.data.map(event => ({
-          ...event,
-          formattedStartTime: this.formatTime(event.startTime),
-          formattedEndTime: event.endTime ? this.formatTime(event.endTime) : null,
-          statusText: this.getStatusText(event.status)
-        }));
-
-        this.setData({ events });
-        wx.hideLoading();
-      })
-      .catch(err => {
-        console.error('获取活动列表失败：', err);
-        wx.hideLoading();
-        wx.showToast({
-          title: '加载失败',
-          icon: 'none'
+    console.log('Loading events...');
+    wx.cloud.callFunction({
+      name: 'getRegisteredEvents',
+      data: {
+        mode: 'all'
+      }
+    }).then(res => {
+      console.log('Got events response:', res);
+      if (res.result.success) {
+        // 处理时间格式和计算收款总额
+        const events = res.result.events.map(event => {
+          // 确保 mode 字段存在
+          event.mode = event.mode || 'gugu';
+          
+          // 格式化时间
+          event.startTime = this.formatDate(event.startTime);
+          if (event.endTime) {
+            event.endTime = this.formatDate(event.endTime);
+          }
+          
+          // 计算收款模式的总金额
+          if (event.mode === 'payment') {
+            event.totalPayment = event.totalPaid || 0;
+          }
+          
+          return event;
         });
+        
+        console.log('Processed events:', events);
+        this.setData({ events });
+      }
+      wx.hideLoading();
+    }).catch(err => {
+      console.error('获取活动列表失败:', err);
+      wx.hideLoading();
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
       });
+    });
   },
 
-  formatTime(timestamp) {
+  formatDate(timestamp) {
+    if (!timestamp) return '';
     const date = new Date(timestamp);
-    return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
   },
 
-  getStatusText(status) {
-    const statusMap = {
-      'pending': '进行中',
-      'completed': '已完成',
-      'cancelled': '已取消',
-      'gugu': '已咕咕'
-    };
-    return statusMap[status] || status;
-  },
-
-  // 添加跳转函数
   goToEventDetail(e) {
-    const eventId = e.currentTarget.dataset.id;
+    const id = e.currentTarget.dataset.id;
     wx.navigateTo({
-      url: `/pages/event/detail?id=${eventId}`
+      url: `/pages/event/detail?id=${id}`
     });
   }
 }); 
