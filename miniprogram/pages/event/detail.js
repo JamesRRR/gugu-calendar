@@ -5,7 +5,47 @@ Page({
     hasJoined: false,
     formattedStartTime: '',
     formattedEndTime: '',
-    participants: []
+    participants: [],
+    needProfile: false,
+    needProfileMessage: '',
+    profileNickName: ''
+  },
+
+  // 通过用户操作触发授权，确保有昵称+头像+openId，并同步到云端 users
+  ensureUserProfile() {
+    const cached = wx.getStorageSync('userInfo') || {};
+    const badNickName = !cached.nickName || cached.nickName === '微信用户' || cached.nickName === '匿名用户';
+    const badAvatarUrl = !cached.avatarUrl || (typeof cached.avatarUrl === 'string' && cached.avatarUrl.startsWith('wxfile://'));
+    const hasAvatar = !!cached.avatarFileId || !badAvatarUrl;
+    // 加入活动不需要前端拿 openId（云函数可直接拿到 OPENID），这里只要求头像+昵称（且头像不能是 wxfile:// 临时路径）
+    const hasProfile = !!(hasAvatar && !badNickName);
+    if (hasProfile) {
+      // 轻量同步一次，避免云端 users 缺字段
+      return wx.cloud.callFunction({
+        name: 'updateUser',
+        data: { userInfo: cached }
+      }).catch(() => {}).then(() => cached);
+    }
+
+    return new Promise((resolve, reject) => {
+      wx.getUserProfile({
+        desc: '用于在活动中展示头像昵称',
+        success: (res) => {
+          const userInfo = res.userInfo || {};
+          // 注意：这里不再调用 login 云函数获取 openId，避免因为云调用异常导致“已授权却提示未授权”
+          getApp().globalData.userInfo = userInfo;
+          wx.setStorageSync('userInfo', userInfo);
+
+          wx.cloud.callFunction({
+            name: 'updateUser',
+            data: { userInfo }
+          }).then(() => {
+            resolve(userInfo);
+          }).catch(reject);
+        },
+        fail: reject
+      });
+    });
   },
 
   getEnvVersion() {
@@ -105,15 +145,34 @@ Page({
     if (!event || !event._id) return;
 
     wx.showLoading({ title: '加入中' });
-    wx.cloud.callFunction({
-      name: 'joinEvent',
-      data: { eventId: event._id }
+    this.ensureUserProfile().then(userInfo => {
+      return wx.cloud.callFunction({
+        name: 'joinEvent',
+        data: {
+          eventId: event._id,
+          userInfo: {
+            nickName: userInfo.nickName,
+            avatarUrl: userInfo.avatarUrl,
+            avatarFileId: userInfo.avatarFileId
+          }
+        }
+      });
     }).then(res => {
       wx.hideLoading();
       if (res.result && res.result.success) {
         wx.showToast({ title: '已加入', icon: 'success' });
         this.fetchEventDetails(event._id);
       } else {
+        if (res && res.result && res.result.code === 'NEED_PROFILE') {
+          const cached = wx.getStorageSync('userInfo') || {};
+          const badNickName = !cached.nickName || cached.nickName === '微信用户' || cached.nickName === '匿名用户';
+          this.setData({
+            needProfile: true,
+            needProfileMessage: res.result.message || '请先授权头像和昵称后再加入',
+            profileNickName: badNickName ? '' : cached.nickName
+          });
+          return;
+        }
         wx.showToast({
           title: (res.result && res.result.message) || '加入失败',
           icon: 'none'
@@ -122,7 +181,79 @@ Page({
     }).catch(err => {
       console.error('加入活动失败：', err);
       wx.hideLoading();
-      wx.showToast({ title: '加入失败', icon: 'none' });
+      const msg = (err && (err.errMsg || err.message)) || '加入失败';
+      // getUserProfile 的 TAP 限制：提示用户直接点“加入”触发授权
+      if (typeof msg === 'string' && msg.includes('getUserProfile:fail')) {
+        this.setData({
+          needProfile: true,
+          needProfileMessage: '请点击下方按钮授权头像昵称后再加入'
+        });
+        return;
+      }
+      wx.showToast({ title: msg, icon: 'none' });
+    });
+  },
+
+  onProfileNickNameChange(e) {
+    this.setData({ profileNickName: (e && e.detail && e.detail.value) || '' });
+  },
+
+  closeNeedProfile() {
+    this.setData({ needProfile: false, needProfileMessage: '' });
+  },
+
+  authorizeAndJoin() {
+    // 用户点击触发：先确保有头像（getUserProfile），再要求用户填昵称，然后写入 users 后加入
+    const nickName = (this.data.profileNickName || '').trim();
+    if (!nickName || nickName === '微信用户' || nickName === '匿名用户') {
+      wx.showToast({ title: '请先填写昵称', icon: 'none' });
+      return;
+    }
+
+    wx.showLoading({ title: '授权中' });
+    this.ensureUserProfile().then((cached) => {
+      const merged = {
+        ...cached,
+        nickName
+      };
+      wx.setStorageSync('userInfo', merged);
+      getApp().globalData.userInfo = merged;
+
+      return wx.cloud.callFunction({
+        name: 'updateUser',
+        data: {
+          userInfo: {
+            nickName: merged.nickName,
+            avatarUrl: merged.avatarUrl,
+            avatarFileId: merged.avatarFileId
+          }
+        }
+      }).then(() => merged);
+    }).then((merged) => {
+      this.setData({ needProfile: false, needProfileMessage: '' });
+      return wx.cloud.callFunction({
+        name: 'joinEvent',
+        data: {
+          eventId: this.data.event && this.data.event._id,
+          userInfo: {
+            nickName: merged.nickName,
+            avatarUrl: merged.avatarUrl,
+            avatarFileId: merged.avatarFileId
+          }
+        }
+      });
+    }).then((res) => {
+      wx.hideLoading();
+      if (res.result && res.result.success) {
+        wx.showToast({ title: '已加入', icon: 'success' });
+        this.fetchEventDetails(this.data.event._id);
+      } else {
+        wx.showToast({ title: (res.result && res.result.message) || '加入失败', icon: 'none' });
+      }
+    }).catch((err) => {
+      wx.hideLoading();
+      const msg = (err && (err.errMsg || err.message)) || '授权失败';
+      wx.showToast({ title: msg, icon: 'none' });
     });
   },
 

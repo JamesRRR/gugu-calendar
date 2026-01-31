@@ -1,10 +1,21 @@
 <view class="profile-container">
   <!-- 用户信息卡片 -->
   <view class="user-card">
-    <button class="avatar-wrapper" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" wx:if="{{!hasUserInfo}}">
-      <image class="avatar" src="/images/default-avatar.png" mode="aspectFill"></image>
+    <button
+      class="avatar-wrapper"
+      open-type="chooseAvatar"
+      bindchooseavatar="onChooseAvatar"
+      wx:if="{{hasUserInfo}}"
+    >
+      <image
+        wx:if="{{userInfo.avatarUrl}}"
+        class="avatar"
+        src="{{userInfo.avatarUrl}}"
+        mode="aspectFill"
+      />
+      <view wx:else class="avatar avatar-placeholder">👤</view>
     </button>
-    <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill" wx:else></image>
+    <view wx:else class="avatar avatar-placeholder">👤</view>
     
     <view class="user-info">
       <input type="nickname" class="nickname" placeholder="点击设置昵称" 

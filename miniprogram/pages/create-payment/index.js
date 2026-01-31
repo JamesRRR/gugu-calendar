@@ -16,7 +16,53 @@ Page({
       totalAmount: '',
       description: ''
     },
-    descriptionLength: 0
+    descriptionLength: 0,
+    dateOptions: [],
+    timeOptions: [],
+    startPickerValue: [0, 0],
+    endPickerValue: [0, 0]
+  },
+
+  onLoad() {
+    const dateOptions = this.buildDateOptions(730);
+    const timeOptions = this.buildTimeOptions(5);
+    this.setData({
+      dateOptions,
+      timeOptions,
+      startPickerValue: [0, 0],
+      endPickerValue: [0, 0]
+    });
+  },
+
+  buildDateOptions(daysAhead) {
+    const days = Number(daysAhead) || 365;
+    const out = [];
+    const base = new Date();
+    base.setHours(0, 0, 0, 0);
+    for (let i = 0; i <= days; i++) {
+      const d = new Date(base.getTime() + i * 24 * 60 * 60 * 1000);
+      out.push(this.formatYMD(d));
+    }
+    return out;
+  },
+
+  buildTimeOptions(stepMinutes) {
+    const step = Number(stepMinutes) || 5;
+    const out = [];
+    for (let h = 0; h < 24; h++) {
+      for (let m = 0; m < 60; m += step) {
+        out.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+      }
+    }
+    return out;
+  },
+
+  formatYMD(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  },
+
+  formatHM(d) {
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   },
 
   goToTab(e) {
@@ -85,27 +131,46 @@ Page({
   },
 
   // 时间选择器的处理方法
-  onStartDateChange(e) {
+  onStartDateTimeChange(e) {
+    const [dateIndex, timeIndex] = e.detail.value || [0, 0];
+    const startDate = this.data.dateOptions[dateIndex];
+    const startTimeStr = this.data.timeOptions[timeIndex];
+
+    const startTs = this.toTimestamp(startDate, startTimeStr, '00:00');
+    const endDt = new Date(startTs + 60 * 60 * 1000);
+    const endDate = this.formatYMD(endDt);
+    const endTimeStr = this.formatHM(endDt);
+
+    const endDateIndex = Math.max(0, this.data.dateOptions.indexOf(endDate));
+    const endTimeIndex = Math.max(0, this.data.timeOptions.indexOf(endTimeStr));
+
     this.setData({
-      'formData.startDate': e.detail.value
+      startPickerValue: [dateIndex, timeIndex],
+      endPickerValue: [endDateIndex, endTimeIndex],
+      'formData.startDate': startDate,
+      'formData.startTime': startTimeStr,
+      'formData.endDate': endDate,
+      'formData.endTime': endTimeStr
     });
   },
 
-  onStartTimeChange(e) {
-    this.setData({
-      'formData.startTime': e.detail.value
-    });
-  },
+  onEndDateTimeChange(e) {
+    const [dateIndex, timeIndex] = e.detail.value || [0, 0];
+    const endDate = this.data.dateOptions[dateIndex];
+    const endTimeStr = this.data.timeOptions[timeIndex];
 
-  onEndDateChange(e) {
-    this.setData({
-      'formData.endDate': e.detail.value
-    });
-  },
+    const startTs = this.toTimestamp(this.data.formData.startDate, this.data.formData.startTime, '00:00');
+    const endTs = this.toTimestamp(endDate, endTimeStr, '23:59');
 
-  onEndTimeChange(e) {
+    if (!Number.isNaN(startTs) && !Number.isNaN(endTs) && endTs < startTs) {
+      wx.showToast({ title: '结束时间不能早于开始时间', icon: 'none' });
+      return;
+    }
+
     this.setData({
-      'formData.endTime': e.detail.value
+      endPickerValue: [dateIndex, timeIndex],
+      'formData.endDate': endDate,
+      'formData.endTime': endTimeStr
     });
   },
 
@@ -163,11 +228,23 @@ Page({
         icon: 'none'
       });
     }
+    if (!formData.startTime) {
+      return wx.showToast({
+        title: '请选择开始时间',
+        icon: 'none'
+      });
+    }
 
     // 验证结束日期
     if (!formData.endDate) {
       return wx.showToast({
         title: '请选择结束日期',
+        icon: 'none'
+      });
+    }
+    if (!formData.endTime) {
+      return wx.showToast({
+        title: '请选择结束时间',
         icon: 'none'
       });
     }
@@ -188,6 +265,13 @@ Page({
     if (Number.isNaN(startTime) || Number.isNaN(endTime)) {
       return wx.showToast({
         title: '时间格式不正确',
+        icon: 'none'
+      });
+    }
+
+    if (endTime < startTime) {
+      return wx.showToast({
+        title: '结束时间不能早于开始时间',
         icon: 'none'
       });
     }

@@ -27,6 +27,12 @@
   padding-bottom: 16rpx;
 }
 
+.event-badges {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
 .event-title {
   font-size: 32rpx;
   font-weight: 600;
@@ -35,8 +41,13 @@
 
 .event-status {
   font-size: 24rpx;
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
+  height: 44rpx;
+  padding: 0 12rpx;
+  border-radius: 999rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .event-status.pending {
@@ -44,19 +55,19 @@
   color: #69c0ff;
 }
 
+.event-status.ongoing {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
 .event-status.completed {
   background: #f0ffe6;
-  color: #95de64;
+  color: #52c41a;
 }
 
 .event-status.cancelled {
   background: #fff0f0;
-  color: #ff9999;
-}
-
-.event-status.gugu {
-  background: #fff7e6;
-  color: #ffc069;
+  color: #ff4d4f;
 }
 
 .event-info {

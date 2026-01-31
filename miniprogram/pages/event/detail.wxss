@@ -132,6 +132,88 @@
   gap: 12rpx;
 }
 
+.auth-overlay {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 40rpx;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 600rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 36rpx 30rpx;
+  box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.12);
+}
+
+.auth-title {
+  text-align: center;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 18rpx;
+}
+
+.auth-desc {
+  text-align: center;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 28rpx;
+}
+
+.auth-nickname {
+  width: 100%;
+  height: 84rpx;
+  border-radius: 18rpx;
+  background: #fff8f8;
+  border: 2rpx solid #ffe4e6;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 18rpx;
+  box-sizing: border-box;
+}
+
+.auth-btn {
+  width: 100%;
+  height: 84rpx;
+  border-radius: 42rpx;
+  background: linear-gradient(135deg, #baf3dc, #8fe6c8);
+  color: #1f5b43;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+}
+
+.auth-btn::after {
+  border: none;
+}
+
+.auth-cancel {
+  width: 100%;
+  height: 84rpx;
+  border-radius: 42rpx;
+  background: #f5f5f5;
+  color: #666;
+  font-size: 30rpx;
+  margin-top: 16rpx;
+  border: none;
+}
+
+.auth-cancel::after {
+  border: none;
+}
+
 .action-btn {
   min-width: 140rpx;
   flex: 1;

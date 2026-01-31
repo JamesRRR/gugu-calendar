@@ -26,10 +26,30 @@ Page({
     // 尝试从本地存储获取用户信息
     const userInfo = wx.getStorageSync('userInfo');
     if (userInfo) {
+      const badNickName = !userInfo.nickName || userInfo.nickName === '微信用户' || userInfo.nickName === '匿名用户';
+      const hasProfile = !!(userInfo.openId && (userInfo.avatarUrl || userInfo.avatarFileId) && !badNickName);
       this.setData({
         userInfo: userInfo,
-        hasUserInfo: true
+        hasUserInfo: hasProfile
       });
+
+      // 若本地只有 avatarFileId（云存储），补一个可展示的临时 URL
+      if (!userInfo.avatarUrl && userInfo.avatarFileId) {
+        wx.cloud.getTempFileURL({
+          fileList: [userInfo.avatarFileId]
+        }).then(r => {
+          const url = r.fileList && r.fileList[0] && r.fileList[0].tempFileURL;
+          if (url) {
+            const updated = { ...userInfo, avatarUrl: url };
+            this.setData({ userInfo: updated });
+            wx.setStorageSync('userInfo', updated);
+            getApp().globalData.userInfo = updated;
+          }
+        }).catch(err => {
+          console.error('获取头像临时链接失败：', err);
+        });
+      }
+
       // 确保userInfo中有openId
       if (userInfo.openId) {
         this.loadUserStats();
@@ -103,22 +123,54 @@ Page({
 
   onChooseAvatar(e) {
     const { avatarUrl } = e.detail;
-    const userInfo = { 
-      ...this.data.userInfo, 
+    const userInfo = {
+      ...(this.data.userInfo || {}),
       avatarUrl
     };
-    
-    this.setData({ userInfo });
-    getApp().globalData.userInfo = userInfo;
-    wx.setStorageSync('userInfo', userInfo);
 
-    wx.cloud.callFunction({
-      name: 'updateUser',
-      data: {
-        userInfo
+    const ensureOpenId = userInfo.openId
+      ? Promise.resolve(userInfo.openId)
+      : wx.cloud.callFunction({ name: 'login' }).then(res => {
+          userInfo.openId = res.result.openid;
+          return userInfo.openId;
+        });
+
+    ensureOpenId.then((openid) => {
+      // chooseAvatar 返回的是本地临时路径 wxfile://，需要上传到云存储供他人/跨设备展示
+      const needUpload = typeof avatarUrl === 'string' && avatarUrl.startsWith('wxfile://');
+      if (!needUpload) return null;
+
+      const cloudPath = `avatars/${openid}_${Date.now()}.png`;
+      return wx.cloud.uploadFile({
+        cloudPath,
+        filePath: avatarUrl
+      }).then(up => up.fileID);
+    }).then((fileID) => {
+      if (fileID) {
+        userInfo.avatarFileId = fileID;
       }
+
+      this.setData({ userInfo, hasUserInfo: true });
+      getApp().globalData.userInfo = userInfo;
+      wx.setStorageSync('userInfo', userInfo);
+
+      wx.cloud.callFunction({
+        name: 'updateUser',
+        data: {
+          userInfo: {
+            nickName: userInfo.nickName,
+            avatarUrl: userInfo.avatarUrl, // 若是 wxfile:// 云端会忽略
+            avatarFileId: userInfo.avatarFileId
+          }
+        }
+      }).then(() => {
+        this.loadUserStats();
+      }).catch(err => {
+        console.error('更新头像失败：', err);
+      });
     }).catch(err => {
-      console.error('更新头像失败：', err);
+      console.error('获取 openId 失败：', err);
+      wx.showToast({ title: '更新头像失败', icon: 'none' });
     });
   },
 

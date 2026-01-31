@@ -59,6 +59,25 @@ exports.main = async (event, context) => {
             }
           )
         })
+
+        // 如果头像存的是云存储 fileID，则转成可访问的临时 URL 返回给小程序展示
+        const fileIds = participants
+          .map(p => p && p.avatarFileId)
+          .filter(Boolean)
+        if (fileIds.length > 0) {
+          const tempRes = await cloud.getTempFileURL({ fileList: fileIds })
+          const urlMap = new Map(
+            (tempRes.fileList || [])
+              .filter(x => x && x.fileID && x.tempFileURL)
+              .map(x => [x.fileID, x.tempFileURL])
+          )
+          participants = participants.map(p => {
+            const temp = p.avatarFileId && urlMap.get(p.avatarFileId)
+            // 只要有 avatarFileId，就用最新临时链接覆盖（避免旧 temp URL 过期导致头像空白）
+            if (temp) return { ...p, avatarUrl: temp }
+            return p
+          })
+        }
       }
     } catch (e) {
       // users 集合可能不存在/无数据时不阻断详情页

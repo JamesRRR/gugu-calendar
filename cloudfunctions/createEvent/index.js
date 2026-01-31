@@ -26,6 +26,19 @@ exports.main = async (event, context) => {
 
   try {
     const { mode, paymentAmount, totalAmount, ...eventData } = event;
+
+    // 开始/结束时间必填校验
+    const startTime = eventData && eventData.startTime
+    const endTime = eventData && eventData.endTime
+    if (typeof startTime !== 'number' || Number.isNaN(startTime)) {
+      return { success: false, message: '开始时间必填', requestId }
+    }
+    if (typeof endTime !== 'number' || Number.isNaN(endTime)) {
+      return { success: false, message: '结束时间必填', requestId }
+    }
+    if (endTime < startTime) {
+      return { success: false, message: '结束时间不能早于开始时间', requestId }
+    }
     
     const eventDoc = {
       ...eventData,

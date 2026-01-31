@@ -3,15 +3,22 @@
     <view class="event-item" wx:for="{{events}}" wx:key="_id" bindtap="goToEventDetail" data-id="{{item._id}}">
       <view class="event-header">
         <text class="event-title">{{item.title}}</text>
-        <text class="event-mode {{item.mode === 'payment' ? 'payment-mode' : 'gugu-mode'}}">
-          {{item.mode === 'payment' ? '收款模式' : '咕咕模式'}}
-        </text>
+        <view class="event-badges">
+          <text class="event-status {{item.statusClass}}">{{item.statusText}}</text>
+          <text class="event-mode {{item.mode === 'payment' ? 'payment-mode' : 'gugu-mode'}}">
+            {{item.mode === 'payment' ? '收款模式' : '咕咕模式'}}
+          </text>
+        </view>
       </view>
       
       <view class="event-info">
         <view class="info-item">
           <text class="icon">📅</text>
-          <text>{{item.startTime}}</text>
+          <text>{{item.startTimeText}}</text>
+        </view>
+        <view class="info-item">
+          <text class="icon">⏰</text>
+          <text>{{item.endTimeText}}</text>
         </view>
         <view class="info-item">
           <text class="icon">📍</text>

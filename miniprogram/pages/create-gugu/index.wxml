@@ -21,34 +21,32 @@
       <view class="form-item">
         <text class="label required">开始时间</text>
         <view class="time-container">
-          <picker mode="date" value="{{formData.startDate}}" bindchange="onStartDateChange">
-            <view class="picker {{formData.startDate ? '' : 'empty'}}">
-              <text class="icon">📅</text>
-              <text>{{formData.startDate || '选择日期'}}</text>
-            </view>
-          </picker>
-          <picker mode="time" value="{{formData.startTime}}" bindchange="onStartTimeChange">
-            <view class="picker {{formData.startTime ? '' : 'empty'}}">
-              <text class="icon">⏰</text>
-              <text>{{formData.startTime || '选择时间'}}</text>
+          <picker
+            mode="multiSelector"
+            range="{{[dateOptions, timeOptions]}}"
+            value="{{startPickerValue}}"
+            bindchange="onStartDateTimeChange"
+          >
+            <view class="picker {{(formData.startDate && formData.startTime) ? '' : 'empty'}}">
+              <text class="icon">🕒</text>
+              <text>{{(formData.startDate && formData.startTime) ? (formData.startDate + ' ' + formData.startTime) : '选择开始日期时间'}}</text>
             </view>
           </picker>
         </view>
       </view>
 
       <view class="form-item">
-        <text class="label">结束时间（可选）</text>
+        <text class="label required">结束时间</text>
         <view class="time-container">
-          <picker mode="date" value="{{formData.endDate}}" bindchange="onEndDateChange">
-            <view class="picker {{formData.endDate ? '' : 'empty'}}">
-              <text class="icon">📅</text>
-              <text>{{formData.endDate || '选择日期'}}</text>
-            </view>
-          </picker>
-          <picker mode="time" value="{{formData.endTime}}" bindchange="onEndTimeChange">
-            <view class="picker {{formData.endTime ? '' : 'empty'}}">
+          <picker
+            mode="multiSelector"
+            range="{{[dateOptions, timeOptions]}}"
+            value="{{endPickerValue}}"
+            bindchange="onEndDateTimeChange"
+          >
+            <view class="picker {{(formData.endDate && formData.endTime) ? '' : 'empty'}}">
               <text class="icon">⏰</text>
-              <text>{{formData.endTime || '选择时间'}}</text>
+              <text>{{(formData.endDate && formData.endTime) ? (formData.endDate + ' ' + formData.endTime) : '选择结束日期时间'}}</text>
             </view>
           </picker>
         </view>
@@ -98,7 +96,7 @@
             bindchange="onRegretPointsChange" 
           />
         </view>
-        <text class="tips">咕咕时将扣除对应点数��~</text>
+        <text class="tips">咕咕时将扣除 {{formData.regretPointsRequired}} 点咕咕点数~</text>
       </view>
     </view>
 

@@ -24,6 +24,22 @@ exports.main = async (event, context) => {
   try {
     await ensureCollectionExists('users')
 
+    const safeUserInfo = userInfo || {}
+    const isBadNickName = (name) => !name || name === '微信用户' || name === '匿名用户'
+    const isBadAvatar = (url) => !url || url.startsWith('wxfile://')
+
+    const patch = {}
+    if (!isBadNickName(safeUserInfo.nickName)) patch.nickName = safeUserInfo.nickName
+    if (!isBadAvatar(safeUserInfo.avatarUrl)) patch.avatarUrl = safeUserInfo.avatarUrl
+    if (safeUserInfo.avatarFileId) patch.avatarFileId = safeUserInfo.avatarFileId
+    // 可选字段（不强制）
+    if (safeUserInfo.gender !== undefined) patch.gender = safeUserInfo.gender
+    if (safeUserInfo.language) patch.language = safeUserInfo.language
+    if (safeUserInfo.country) patch.country = safeUserInfo.country
+    if (safeUserInfo.province) patch.province = safeUserInfo.province
+    if (safeUserInfo.city) patch.city = safeUserInfo.city
+    patch.updateTime = db.serverDate()
+
     // 检查用户是否已存在
     const userCheck = await db.collection('users')
       .where({
@@ -35,7 +51,7 @@ exports.main = async (event, context) => {
       // 新用户，创建带有初始点数的记录
       await db.collection('users').add({
         data: {
-          ...userInfo,
+          ...patch,
           _openid: wxContext.OPENID,
           regretPoints: 5,  // 初始点数
           lastPointsUpdate: db.serverDate(),  // 记录最后更新时间
@@ -48,7 +64,7 @@ exports.main = async (event, context) => {
         _openid: wxContext.OPENID
       }).update({
         data: {
-          ...userInfo
+          ...patch
         }
       })
     }

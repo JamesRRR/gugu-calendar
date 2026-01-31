@@ -93,4 +93,21 @@
       </button>
     </block>
   </view>
+
+  <!-- 授权浮层：必须由用户点击触发授权 -->
+  <view wx:if="{{needProfile}}" class="auth-overlay">
+    <view class="auth-card">
+      <view class="auth-title">需要授权</view>
+      <view class="auth-desc">{{needProfileMessage}}</view>
+      <input
+        type="nickname"
+        class="auth-nickname"
+        placeholder="请输入昵称（用于活动参与者展示）"
+        value="{{profileNickName}}"
+        bindchange="onProfileNickNameChange"
+      />
+      <button class="auth-btn" bindtap="authorizeAndJoin">去授权并加入</button>
+      <button class="auth-cancel" bindtap="closeNeedProfile">取消</button>
+    </view>
+  </view>
 </view> 

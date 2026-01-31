@@ -18,10 +18,53 @@ async function ensureCollectionExists(name) {
   }
 }
 
+async function getOrUpsertUser(openid, incomingUserInfo) {
+  await ensureCollectionExists('users')
+  const incoming = incomingUserInfo || {}
+  const nickName = incoming.nickName || '匿名用户'
+  const avatarUrl = incoming.avatarUrl || ''
+  const avatarFileId = incoming.avatarFileId || ''
+
+  const isBadNickName = (name) => !name || name === '微信用户' || name === '匿名用户'
+  const isBadAvatar = (url) => !url || url.startsWith('wxfile://')
+  const isBadAvatarFileId = (id) => !id
+
+  const existing = await db.collection('users').where({ _openid: openid }).get()
+  if (existing.data && existing.data.length > 0) {
+    // 补齐缺失字段（不强行覆盖用户已有数据）
+    const current = existing.data[0]
+    const patch = {}
+    if ((isBadNickName(current.nickName) && !isBadNickName(nickName))) patch.nickName = nickName
+    if ((isBadAvatar(current.avatarUrl) && !isBadAvatar(avatarUrl))) patch.avatarUrl = avatarUrl
+    if ((isBadAvatarFileId(current.avatarFileId) && !isBadAvatarFileId(avatarFileId))) patch.avatarFileId = avatarFileId
+    if (Object.keys(patch).length > 0) {
+      await db.collection('users').where({ _openid: openid }).update({
+        data: {
+          ...patch,
+          updateTime: db.serverDate()
+        }
+      })
+    }
+    return
+  }
+
+  await db.collection('users').add({
+    data: {
+      _openid: openid,
+      nickName: isBadNickName(nickName) ? '匿名用户' : nickName,
+      avatarUrl: isBadAvatar(avatarUrl) ? '' : avatarUrl,
+      avatarFileId: isBadAvatarFileId(avatarFileId) ? '' : avatarFileId,
+      regretPoints: 5,
+      createTime: db.serverDate(),
+      updateTime: db.serverDate()
+    }
+  })
+}
+
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
-  const requestId = context && (context.requestId || context.requestID)
-  const { eventId } = event || {}
+  const requestId = context && (context.requestId || context.requestID || context.RequestId)
+  const { eventId, userInfo } = event || {}
 
   if (!eventId) {
     return { success: false, message: '参数错误', requestId }
@@ -29,6 +72,52 @@ exports.main = async (event, context) => {
 
   try {
     await ensureCollectionExists('events')
+    await getOrUpsertUser(wxContext.OPENID, userInfo)
+
+    // 强制要求用户已授权昵称+头像（否则不允许加入，避免匿名用户污染参与者列表）
+    await ensureCollectionExists('users')
+    const userRes = await db.collection('users').where({ _openid: wxContext.OPENID }).get()
+    const me = userRes.data && userRes.data[0]
+    const isBadNickName = (name) => !name || name === '微信用户' || name === '匿名用户'
+    const isBadAvatar = (url) => !url || url.startsWith('wxfile://')
+    const hasAvatar = me && (!isBadAvatar(me.avatarUrl) || !!me.avatarFileId)
+    if (!me || isBadNickName(me.nickName) || !hasAvatar) {
+      const incoming = userInfo || {}
+      logger.warn({
+        msg: 'joinEvent: NEED_PROFILE',
+        requestId,
+        openid: wxContext.OPENID,
+        me: me
+          ? {
+              nickName: me.nickName,
+              hasAvatarUrl: !!me.avatarUrl,
+              avatarUrlPrefix: typeof me.avatarUrl === 'string' ? me.avatarUrl.slice(0, 20) : '',
+              hasAvatarFileId: !!me.avatarFileId
+            }
+          : null,
+        incoming: {
+          nickName: incoming.nickName,
+          hasAvatarUrl: !!incoming.avatarUrl,
+          avatarUrlPrefix: typeof incoming.avatarUrl === 'string' ? incoming.avatarUrl.slice(0, 20) : '',
+          hasAvatarFileId: !!incoming.avatarFileId
+        }
+      })
+      return {
+        success: false,
+        code: 'NEED_PROFILE',
+        message: '请先登录授权头像和昵称后再加入',
+        requestId,
+        debug: {
+          meExists: !!me,
+          meNickName: me && me.nickName,
+          meHasAvatarUrl: !!(me && me.avatarUrl),
+          meHasAvatarFileId: !!(me && me.avatarFileId),
+          incomingNickName: incoming.nickName,
+          incomingHasAvatarUrl: !!incoming.avatarUrl,
+          incomingHasAvatarFileId: !!incoming.avatarFileId
+        }
+      }
+    }
 
     const openid = wxContext.OPENID
     const eventRes = await db.collection('events').doc(eventId).get()
