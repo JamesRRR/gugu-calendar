@@ -22,6 +22,15 @@
   border: 4rpx solid #ffe4e6;
 }
 
+.avatar-placeholder {
+  background: #fff5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff8c98;
+  font-size: 52rpx;
+}
+
 .avatar-wrapper {
   padding: 0;
   width: 120rpx !important;

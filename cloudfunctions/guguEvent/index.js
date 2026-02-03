@@ -29,6 +29,7 @@ async function getOrCreateUser(openid, incomingUserInfo, requestId) {
         _openid: openid,
         nickName: incoming.nickName || '匿名用户',
         avatarUrl: incoming.avatarUrl || '',
+        avatarFileId: incoming.avatarFileId || '',
         regretPoints: 5,
         createTime: db.serverDate(),
         updateTime: db.serverDate()

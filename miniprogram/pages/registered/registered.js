@@ -31,14 +31,31 @@ Page({
       if (res.result.success) {
         // 处理时间格式和计算收款总额
         const events = res.result.events.map(event => {
+          const now = Date.now();
+          const startTs = event.startTime;
+          const endTs = event.endTime;
+
           // 确保 mode 字段存在
           event.mode = event.mode || 'gugu';
-          
-          // 格式化时间
-          event.startTime = this.formatDate(event.startTime);
-          if (event.endTime) {
-            event.endTime = this.formatDate(event.endTime);
+
+          // 计算并补充状态（优先使用云端 status）
+          if (event.status === 'cancelled') {
+            event.statusText = '已取消';
+            event.statusClass = 'cancelled';
+          } else if (typeof endTs === 'number' && now > endTs) {
+            event.statusText = '已结束';
+            event.statusClass = 'completed';
+          } else if (typeof startTs === 'number' && now < startTs) {
+            event.statusText = '未开始';
+            event.statusClass = 'pending';
+          } else {
+            event.statusText = '进行中';
+            event.statusClass = 'ongoing';
           }
+          
+          // 格式化时间（显示用）
+          event.startTimeText = this.formatDate(startTs);
+          event.endTimeText = this.formatDate(endTs);
           
           // 计算收款模式的总金额
           if (event.mode === 'payment') {
