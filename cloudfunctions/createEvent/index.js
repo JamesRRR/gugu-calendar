@@ -61,6 +61,7 @@ exports.main = async (event, context) => {
       eventDoc.paymentAmount = amount  // 每人应付金额
       eventDoc.totalAmount = totalAmount ? parseFloat(totalAmount) : null  // 活动总金额 (可选)
       eventDoc.totalPaid = 0  // 当前已收款
+      eventDoc.isMockPayment = event.isMockPayment === true  // 模拟支付模式
       
       // 付款状态: { openid: 'creator' | 'paid' | 'refunded' }
       eventDoc.paymentStatus = {

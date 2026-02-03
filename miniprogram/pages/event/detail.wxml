@@ -34,6 +34,39 @@
       <text class="description-content">{{event.description}}</text>
     </view>
 
+    <!-- 收款模式：显示付款二维码或模拟付款 -->
+    <view class="payment-section" wx:if="{{event.mode === 'payment'}}">
+      <view class="section-title">付款信息</view>
+      <view class="payment-info">
+        <view class="payment-amount">
+          <text class="amount-label">应付金额：</text>
+          <text class="amount-value">¥{{event.paymentAmount}}</text>
+        </view>
+        
+        <!-- 模拟支付模式 -->
+        <view class="mock-payment" wx:if="{{isMockPayment}}">
+          <view class="mock-badge">🧪 模拟支付</view>
+          <view class="mock-status" wx:if="{{hasMockPaid}}">
+            <text class="mock-success">✅ 模拟支付已完成</text>
+          </view>
+          <view class="mock-status" wx:else>
+            <text class="mock-pending">点击下方按钮完成模拟支付</text>
+            <button class="mock-pay-btn" bindtap="mockPayment">模拟付款</button>
+          </view>
+        </view>
+        
+        <!-- 正常二维码支付 -->
+        <view class="payment-qrcode" wx:if="{{!isMockPayment && paymentQrcodeUrl}}">
+          <image class="qrcode-image" src="{{paymentQrcodeUrl}}" mode="aspectFit"></image>
+          <text class="qrcode-tip">长按识别付款</text>
+        </view>
+        <view class="payment-link" wx:if="{{!isMockPayment && paymentLink}}">
+          <text class="link-label">付款链接：</text>
+          <text class="link-url" selectable="true">{{paymentLink}}</text>
+        </view>
+      </view>
+    </view>
+
     <!-- 参与者列表 -->
     <view class="participants-section">
       <text class="section-title">参与者</text>

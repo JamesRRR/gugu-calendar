@@ -8,7 +8,9 @@ Page({
     participants: [],
     needProfile: false,
     needProfileMessage: '',
-    profileNickName: ''
+    profileNickName: '',
+    paymentQrcodeUrl: '',
+    paymentLink: ''
   },
 
   // 通过用户操作触发授权，确保有昵称+头像+openId，并同步到云端 users
@@ -114,6 +116,31 @@ Page({
         formattedStartTime,
         formattedEndTime
       });
+
+      // DEBUG: Log event data for debugging
+      console.log('=== QR Code Debug ===');
+      console.log('event.mode:', event.mode);
+      console.log('event.isMockPayment:', event.isMockPayment);
+      console.log('res.result.data.isMockPayment:', res.result.data && res.result.data.isMockPayment);
+
+      // 如果是付款模式
+      if (event.mode === 'payment') {
+        console.log('进入付款模式判断');
+        // 如果是模拟支付模式，直接标记已付款，跳过二维码
+        if (event.isMockPayment === true) {
+          console.log('✅ 模拟支付模式，跳过二维码');
+          this.setData({
+            isMockPayment: true,
+            hasMockPaid: true  // 模拟支付已自动完成
+          });
+        } else {
+          console.log('⚠️ 正常支付模式，调用 getWXACode');
+          // 正常模式，生成付款二维码
+          this.generatePaymentQRCode(event);
+        }
+      } else {
+        console.log('❌ 不是付款模式，mode =', event.mode);
+      }
     }).catch(err => {
       console.error('获取活动详情失败：', err);
       wx.hideLoading();
@@ -257,6 +284,38 @@ Page({
     });
   },
 
+  // 模拟支付（仅用于测试）
+  mockPayment() {
+    const event = this.data.event;
+    if (!event || !event._id) return;
+    
+    wx.showLoading({ title: '模拟支付中' });
+    
+    // 直接调用创建付款云函数，标记为已付款
+    wx.cloud.callFunction({
+      name: 'createPayment',
+      data: {
+        eventId: event._id,
+        points: 0,
+        price: event.paymentAmount || 0
+      }
+    }).then(res => {
+      wx.hideLoading();
+      if (res.result && res.result.success) {
+        this.setData({ hasMockPaid: true });
+        wx.showToast({ title: '模拟支付成功', icon: 'success' });
+        // 刷新页面
+        this.fetchEventDetails(event._id);
+      } else {
+        wx.showToast({ title: '支付失败', icon: 'none' });
+      }
+    }).catch(err => {
+      wx.hideLoading();
+      console.error('模拟支付失败：', err);
+      wx.showToast({ title: '支付失败', icon: 'none' });
+    });
+  },
+
   // 退出活动
   quitEvent() {
     wx.showModal({
@@ -312,6 +371,61 @@ Page({
           this.regretEvent();
         }
       }
+    });
+  },
+
+  // 生成付款二维码
+  generatePaymentQRCode(event) {
+    console.log('=== generatePaymentQRCode called ===');
+    console.log('event._id:', event._id);
+    console.log('event.mode:', event.mode);
+    console.log('event.isMockPayment:', event.isMockPayment);
+    
+    if (!event || !event._id) {
+      console.log('❌ generatePaymentQRCode: event or _id is missing');
+      return;
+    }
+
+    // 生成付款链接（可以是小程序码路径或H5支付链接）
+    const paymentLink = `pages/event/detail?id=${event._id}&mode=payment`;
+    console.log('paymentLink:', paymentLink);
+    
+    // 生成小程序码
+    console.log('📞 调用 getWXACode 云函数...');
+    wx.cloud.callFunction({
+      name: 'getWXACode',
+      data: {
+        path: paymentLink,
+        width: 430
+      }
+    }).then(res => {
+      console.log('getWXACode 响应:', res);
+      if (res.result && res.result.fileID) {
+        console.log('✅ getWXACode 成功，fileID:', res.result.fileID);
+        // 获取临时文件URL
+        return wx.cloud.getTempFileURL({
+          fileList: [res.result.fileID]
+        }).then(urlRes => {
+          console.log('getTempFileURL 响应:', urlRes);
+          if (urlRes.fileList && urlRes.fileList[0] && urlRes.fileList[0].tempFileURL) {
+            const url = urlRes.fileList[0].tempFileURL;
+            console.log('✅ 付款二维码URL:', url);
+            this.setData({
+              paymentQrcodeUrl: url
+            });
+          } else {
+            console.log('❌ getTempFileURL 返回无效数据:', urlRes);
+          }
+        });
+      } else {
+        console.log('❌ getWXACode 返回无效结果:', res);
+      }
+    }).catch(err => {
+      console.error('❌ 生成付款二维码失败：', err);
+      // 如果生成小程序码失败，显示付款链接
+      this.setData({
+        paymentLink: `weixin://wxpay/bizpayurl?pr=${event._id.slice(-10)}`
+      });
     });
   },
 

@@ -9,7 +9,7 @@
 
   <button class="mode-btn payment-mode" bindtap="navigateToPaymentMode">
     <view class="mode-icon">💰</view>
-    <view class="mode-title">收款模式</view>
+    <view class="mode-title">预付模式</view>
     <view class="mode-desc">参与者需要支付固定金额</view>
   </button>
 </view> 
