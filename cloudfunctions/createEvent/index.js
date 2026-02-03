@@ -8,7 +8,6 @@ const db = cloud.database()
 const logger = cloud.logger ? cloud.logger() : console
 
 async function ensureCollectionExists(name) {
-  // wx-server-sdk 支持 createCollection；若集合已存在会报错，这里吞掉即可
   try {
     if (typeof db.createCollection === 'function') {
       await db.createCollection(name)
@@ -40,41 +39,58 @@ exports.main = async (event, context) => {
       return { success: false, message: '结束时间不能早于开始时间', requestId }
     }
     
+    const openid = wxContext.OPENID
+    
+    // 基础数据结构
     const eventDoc = {
       ...eventData,
-      mode: mode || 'gugu', // 默认为咕咕模式
-      creator: wxContext.OPENID,
+      creator: openid,
       createTime: db.serverDate(),
-      participants: [wxContext.OPENID],  // 确保创建者被正确添加为参与者
+      participants: [openid],  // 创建者自动加入
+      quitUsers: [],           // 退出者列表
+      absentees: [],           // 咕咕者列表 (咕咕模式)
       status: 'pending'
     };
 
     // 根据模式添加特定字段
     if (mode === 'payment') {
-      // 确保金额为数字类型
-      eventDoc.paymentAmount = parseFloat(paymentAmount) || 0;
-      eventDoc.totalAmount = totalAmount ? parseFloat(totalAmount) : null;
+      // 付款模式
+      const amount = parseFloat(paymentAmount) || 0
+      
+      eventDoc.mode = 'payment'
+      eventDoc.paymentAmount = amount  // 每人应付金额
+      eventDoc.totalAmount = totalAmount ? parseFloat(totalAmount) : null  // 活动总金额 (可选)
+      eventDoc.totalPaid = 0  // 当前已收款
+      
+      // 付款状态: { openid: 'creator' | 'paid' | 'refunded' }
       eventDoc.paymentStatus = {
-        [wxContext.OPENID]: 'creator'  // 使用正确的语法设置创建者状态
-      };
-      eventDoc.refundStatus = {};  // 用于记录退款状态
-      // 添加支付相关的其他字段
-      eventDoc.paidParticipants = [];  // 已支付的参与者
-      eventDoc.totalPaid = 0;  // 当前总收款金额
+        [openid]: 'creator'  // 创建者标记为 creator
+      }
+      
+      // 退款状态
+      eventDoc.refundStatus = {}  // { openid: { amount, time, reason } }
+      
+      // 标记已支付的参与者列表
+      eventDoc.paidParticipants = [openid]  // 创建者视为已付款
+      
+      logger.info({
+        msg: 'createEvent: payment mode',
+        requestId,
+        openid,
+        paymentAmount: amount
+      })
     } else {
-      eventDoc.regretPointsRequired = event.regretPointsRequired;
+      // 咕咕模式 (默认)
+      eventDoc.mode = 'gugu'
+      eventDoc.regretPointsRequired = event.regretPointsRequired || 1
+      
+      logger.info({
+        msg: 'createEvent: gugu mode',
+        requestId,
+        openid,
+        regretPointsRequired: eventDoc.regretPointsRequired
+      })
     }
-
-    // 打印日志，方便调试（避免日志过大，只打关键字段）
-    logger.info({
-      msg: 'createEvent: creating event',
-      requestId,
-      openid: wxContext.OPENID,
-      mode: eventDoc.mode,
-      title: eventDoc.title,
-      startTime: eventDoc.startTime,
-      endTime: eventDoc.endTime
-    })
 
     let result
     try {
@@ -89,7 +105,7 @@ exports.main = async (event, context) => {
         logger.warn({
           msg: 'createEvent: events collection missing, created and retrying',
           requestId,
-          openid: wxContext.OPENID,
+          openid,
           created
         })
         result = await db.collection('events').add({ data: eventDoc })
@@ -101,17 +117,18 @@ exports.main = async (event, context) => {
     logger.info({
       msg: 'createEvent: event created',
       requestId,
-      openid: wxContext.OPENID,
-      eventId: result && result._id
+      openid,
+      eventId: result && result._id,
+      mode: eventDoc.mode
     })
 
     return {
       success: true,
       eventId: result._id,
+      mode: eventDoc.mode,
       requestId
     };
   } catch (err) {
-    // 结构化错误日志（云函数日志里可检索）
     logger.error({
       msg: 'createEvent: failed',
       requestId,
@@ -126,9 +143,8 @@ exports.main = async (event, context) => {
       requestId,
       error: {
         errCode: err && (err.errCode || err.code),
-        errMsg: err && (err.errMsg || err.message),
-        stack: err && err.stack
+        errMsg: err && (err.errMsg || err.message)
       }
     };
   }
-}; 
+};
