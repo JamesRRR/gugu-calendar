@@ -8,7 +8,9 @@ Page({
     participants: [],
     needProfile: false,
     needProfileMessage: '',
-    profileNickName: ''
+    profileNickName: '',
+    paymentQrcodeUrl: '',
+    paymentLink: ''
   },
 
   // 通过用户操作触发授权，确保有昵称+头像+openId，并同步到云端 users
@@ -114,6 +116,20 @@ Page({
         formattedStartTime,
         formattedEndTime
       });
+
+      // 如果是付款模式
+      if (event.mode === 'payment') {
+        // 如果是模拟支付模式，直接标记已付款，跳过二维码
+        if (event.isMockPayment) {
+          this.setData({
+            isMockPayment: true,
+            hasMockPaid: true  // 模拟支付已自动完成
+          });
+        } else {
+          // 正常模式，生成付款二维码
+          this.generatePaymentQRCode(event);
+        }
+      }
     }).catch(err => {
       console.error('获取活动详情失败：', err);
       wx.hideLoading();
@@ -257,6 +273,38 @@ Page({
     });
   },
 
+  // 模拟支付（仅用于测试）
+  mockPayment() {
+    const event = this.data.event;
+    if (!event || !event._id) return;
+    
+    wx.showLoading({ title: '模拟支付中' });
+    
+    // 直接调用创建付款云函数，标记为已付款
+    wx.cloud.callFunction({
+      name: 'createPayment',
+      data: {
+        eventId: event._id,
+        points: 0,
+        price: event.paymentAmount || 0
+      }
+    }).then(res => {
+      wx.hideLoading();
+      if (res.result && res.result.success) {
+        this.setData({ hasMockPaid: true });
+        wx.showToast({ title: '模拟支付成功', icon: 'success' });
+        // 刷新页面
+        this.fetchEventDetails(event._id);
+      } else {
+        wx.showToast({ title: '支付失败', icon: 'none' });
+      }
+    }).catch(err => {
+      wx.hideLoading();
+      console.error('模拟支付失败：', err);
+      wx.showToast({ title: '支付失败', icon: 'none' });
+    });
+  },
+
   // 退出活动
   quitEvent() {
     wx.showModal({
@@ -312,6 +360,42 @@ Page({
           this.regretEvent();
         }
       }
+    });
+  },
+
+  // 生成付款二维码
+  generatePaymentQRCode(event) {
+    if (!event || !event._id) return;
+
+    // 生成付款链接（可以是小程序码路径或H5支付链接）
+    const paymentLink = `pages/event/detail?id=${event._id}&mode=payment`;
+    
+    // 生成小程序码
+    wx.cloud.callFunction({
+      name: 'getWXACode',
+      data: {
+        path: paymentLink,
+        width: 430
+      }
+    }).then(res => {
+      if (res.result && res.result.fileID) {
+        // 获取临时文件URL
+        return wx.cloud.getTempFileURL({
+          fileList: [res.result.fileID]
+        }).then(urlRes => {
+          if (urlRes.fileList && urlRes.fileList[0] && urlRes.fileList[0].tempFileURL) {
+            this.setData({
+              paymentQrcodeUrl: urlRes.fileList[0].tempFileURL
+            });
+          }
+        });
+      }
+    }).catch(err => {
+      console.error('生成付款二维码失败：', err);
+      // 如果生成小程序码失败，显示付款链接
+      this.setData({
+        paymentLink: `weixin://wxpay/bizpayurl?pr=${event._id.slice(-10)}`
+      });
     });
   },
 

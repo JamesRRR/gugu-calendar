@@ -6,7 +6,7 @@
         <view class="event-badges">
           <text class="event-status {{item.statusClass}}">{{item.statusText}}</text>
           <text class="event-mode {{item.mode === 'payment' ? 'payment-mode' : 'gugu-mode'}}">
-            {{item.mode === 'payment' ? '收款模式' : '咕咕模式'}}
+            {{item.mode === 'payment' ? '预付模式' : '咕咕模式'}}
           </text>
         </view>
       </view>

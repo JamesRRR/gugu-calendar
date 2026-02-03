@@ -299,4 +299,77 @@
   font-size: 28rpx;
   color: #333;
 }
+
+/* 付款信息样式 */
+.payment-section {
+  margin: 30rpx 0;
+  padding: 30rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+
+.payment-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.payment-amount {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 30rpx;
+}
+
+.amount-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.amount-value {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #ff4d4f;
+}
+
+.payment-qrcode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20rpx 0;
+}
+
+.qrcode-image {
+  width: 300rpx;
+  height: 300rpx;
+  border: 2rpx solid #f0f0f0;
+  border-radius: 12rpx;
+}
+
+.qrcode-tip {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 16rpx;
+}
+
+.payment-link {
+  width: 100%;
+  padding: 20rpx;
+  background: #fafafa;
+  border-radius: 12rpx;
+  margin-top: 20rpx;
+}
+
+.link-label {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.link-url {
+  font-size: 24rpx;
+  color: #07c160;
+  word-break: break-all;
+}
  

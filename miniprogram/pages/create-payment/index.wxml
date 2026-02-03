@@ -109,6 +109,24 @@
         </view>
         <text class="tips">活动结束后将退款多余的押金</text>
       </view>
+
+      <!-- Mock payment toggle -->
+      <view class="form-item mock-payment-toggle">
+        <view class="toggle-container">
+          <view class="toggle-info">
+            <text class="toggle-icon">🧪</text>
+            <view class="toggle-text">
+              <text class="toggle-label">模拟支付模式</text>
+              <text class="toggle-desc">用于测试，跳过真实支付流程</text>
+            </view>
+          </view>
+          <switch 
+            checked="{{isMockPayment}}" 
+            bindchange="onMockPaymentChange"
+            color="#FF9E80"
+          />
+        </view>
+      </view>
     </view>
 
     <!-- 活动详情卡片 -->

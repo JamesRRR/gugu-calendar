@@ -20,7 +20,8 @@ Page({
     dateOptions: [],
     timeOptions: [],
     startPickerValue: [0, 0],
-    endPickerValue: [0, 0]
+    endPickerValue: [0, 0],
+    isMockPayment: false  // Mock payment mode toggle
   },
 
   onLoad() {
@@ -210,6 +211,13 @@ Page({
     });
   },
 
+  // Mock payment toggle handler
+  onMockPaymentChange(e) {
+    this.setData({
+      isMockPayment: e.detail.value
+    });
+  },
+
   submitForm(e) {
     const formData = this.data.formData;
     
@@ -292,7 +300,9 @@ Page({
         // 确保金额为数字类型
         paymentAmount: parseFloat(formData.paymentAmount),
         totalAmount: formData.totalAmount ? parseFloat(formData.totalAmount) : null,
-        status: 'pending'
+        status: 'pending',
+        // Mock payment mode
+        isMockPayment: this.data.isMockPayment
       }
     }).then(res => {
       if (res.result && res.result.success) {
