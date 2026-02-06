@@ -1,0 +1,9 @@
+<!-- 鸽子头像组件 - 根据咕咕率显示不同状态的鸽子 -->
+<view class="dove-avatar {{doveClass}}" bindtap="onTap">
+  <view class="dove-emoji">{{doveEmoji}}</view>
+  <view class="dove-crown" wx:if="{{guguRate >= 10}}">👑</view>
+  <view class="dove-status" wx:if="{{showStatus}}">
+    <text class="status-text">{{statusText}}</text>
+    <text class="gugu-rate">({{guguRate}}%)</text>
+  </view>
+</view>

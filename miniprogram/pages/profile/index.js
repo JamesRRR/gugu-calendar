@@ -9,6 +9,7 @@ Page({
       participationRate: '0%',
       regretPoints: 0
     },
+    guguRate: 0, // 咕咕率 (咕咕次数/参与活动总数)
     pointsPackages: [
       { points: 100, price: 648 },
       { points: 10, price: 128 }
@@ -213,8 +214,16 @@ Page({
       if (res.result.success) {
         const stats = res.result.stats;
         console.log('Stats from cloud:', stats);
-        const participationRate = stats.totalEvents > 0 
-          ? ((stats.completedEvents / stats.totalEvents) * 100).toFixed(1)
+        
+        // 计算咕咕率 = (咕咕次数 / 参与活动总数) × 100%
+        const totalEvents = stats.totalEvents || 0;
+        const guguCount = stats.totalGuguCount || 0;
+        const guguRate = totalEvents > 0 
+          ? ((guguCount / totalEvents) * 100).toFixed(1)
+          : 0;
+        
+        const participationRate = totalEvents > 0 
+          ? ((stats.completedEvents / totalEvents) * 100).toFixed(1)
           : 0;
         
         const finalStats = {
@@ -222,13 +231,17 @@ Page({
           participationRate: participationRate + '%',
           regretPoints: stats.regretPoints || 0
         };
+        
         console.log('Final stats to be set:', finalStats);
+        console.log('Gugu rate:', guguRate + '%');
         
         this.setData({
-          stats: finalStats
+          stats: finalStats,
+          guguRate: parseFloat(guguRate)
         }, () => {
           // 在setData的回调中确认数据已更新
           console.log('Current stats after update:', this.data.stats);
+          console.log('Current guguRate:', this.data.guguRate);
         });
       }
     }).catch(err => {
@@ -256,6 +269,19 @@ Page({
       url: '/pages/intro/index',
       fail: (err) => {
         console.error('Navigation failed:', err);
+        wx.showToast({
+          title: '页面跳转失败',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
+  goToLeaderboard() {
+    wx.navigateTo({
+      url: '/pages/leaderboard/leaderboard',
+      fail: (err) => {
+        console.error('Navigation to leaderboard failed:', err);
         wx.showToast({
           title: '页面跳转失败',
           icon: 'none'

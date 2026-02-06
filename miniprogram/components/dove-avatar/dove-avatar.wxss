@@ -1,0 +1,70 @@
+.dove-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 20rpx;
+}
+
+.dove-emoji {
+  font-size: 120rpx;
+  line-height: 1;
+  transition: all 0.3s ease;
+}
+
+.dove-crown {
+  position: absolute;
+  top: 10rpx;
+  right: 20rpx;
+  font-size: 40rpx;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10rpx); }
+}
+
+.dove-status {
+  margin-top: 16rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.status-text {
+  font-size: 24rpx;
+  color: #666;
+  font-weight: 500;
+}
+
+.gugu-rate {
+  font-size: 20rpx;
+  color: #999;
+}
+
+/* 羽毛丰满状态 */
+.dove-avatar.plump .dove-emoji {
+  filter: drop-shadow(0 4rpx 8rpx rgba(135, 206, 250, 0.4));
+}
+
+/* 逐渐脱毛状态 */
+.dove-avatar.molting .dove-emoji {
+  filter: drop-shadow(0 4rpx 8rpx rgba(255, 182, 193, 0.4));
+}
+
+/* 脱毛鸽子状态 - 摇晃动画 */
+.dove-avatar.bald .dove-emoji {
+  filter: drop-shadow(0 4rpx 8rpx rgba(255, 215, 0, 0.4));
+}
+
+.dove-avatar.bald {
+  animation: shake 3s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}

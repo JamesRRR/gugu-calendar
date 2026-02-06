@@ -1,0 +1,85 @@
+<!-- 排行榜页面 -->
+<view class="leaderboard-container">
+  <!-- 今日咕王 -->
+  <view class="today-king-section" wx:if="{{todayKing}}">
+    <view class="section-title">👑 今日咕王 {{todayDate}}</view>
+    <view class="king-card">
+      <view class="king-avatar">
+        <image 
+          wx:if="{{todayKing.avatarUrl}}" 
+          class="avatar-img" 
+          src="{{todayKing.avatarUrl}}" 
+          mode="aspectFill"
+        />
+        <view wx:else class="avatar-placeholder">🐦</view>
+      </view>
+      <view class="king-info">
+        <view class="king-name">{{todayKing.nickName || '神秘鸽手'}}</view>
+        <view class="king-stats">
+          <text class="stat-item">今日咕咕: {{todayKing.todayGuguCount}} 次</text>
+          <text class="stat-item">咕咕率: {{todayKing.guguRate}}%</text>
+        </view>
+        <view class="king-badge">🏆 本场最佳鸽子</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 排行榜列表 -->
+  <view class="leaderboard-section">
+    <view class="section-title">📊 公式墙</view>
+    <view class="leaderboard-list">
+      <view 
+        class="leaderboard-item {{item.isTodayKing ? 'king-item' : ''}}" 
+        wx:for="{{leaderboard}}" 
+        wx:key="rank"
+      >
+        <view class="rank-number {{item.rank <= 3 ? 'top-three' : ''}}">
+          {{item.rank}}
+        </view>
+        
+        <view class="user-avatar">
+          <image 
+            wx:if="{{item.avatarUrl}}" 
+            class="avatar-img" 
+            src="{{item.avatarUrl}}" 
+            mode="aspectFill"
+          />
+          <view wx:else class="avatar-placeholder">🕊️</view>
+        </view>
+        
+        <view class="user-info">
+          <view class="user-name">
+            {{item.nickName || '匿名用户'}}
+            <text class="king-icon" wx:if="{{item.isTodayKing}}">👑</text>
+          </view>
+          <view class="user-stats">
+            <text class="stat-tag">今日 {{item.todayGuguCount}} 咕</text>
+            <text class="stat-rate">咕咕率 {{item.guguRate}}%</text>
+          </view>
+        </view>
+        
+        <view class="dove-status-icon">
+          <dove-avatar guguRate="{{item.guguRate}}" showStatus="{{false}}" size="small" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!isLoading && leaderboard.length === 0}}">
+    <text class="empty-icon">🐦</text>
+    <text class="empty-text">暂无排行榜数据</text>
+    <text class="empty-hint">快去参与活动，成为咕王吧！</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{isLoading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 底部说明 -->
+  <view class="footer-note">
+    <text>🎯 咕咕率 = (咕咕次数 / 参与活动总数) × 100%</text>
+    <text>经常咕咕会被公示在这里哦！</text>
+  </view>
+</view>

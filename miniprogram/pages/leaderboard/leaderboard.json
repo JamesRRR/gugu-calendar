@@ -1,6 +1,6 @@
 {
+  "navigationBarTitleText": "咕咕排行榜",
   "usingComponents": {
     "dove-avatar": "/components/dove-avatar/dove-avatar"
-  },
-  "navigationBarTitleText": "个人中心"
+  }
 }

@@ -7,7 +7,8 @@
     "pages/create-payment/index",
     "pages/event/detail",
     "pages/faq/index",
-    "pages/intro/index"
+    "pages/intro/index",
+    "pages/leaderboard/leaderboard"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -42,6 +43,9 @@
     "weui": true
   },
   "lazyCodeLoading": "requiredComponents",
+  "componentPlaceholder": {
+    "dove-avatar": "/components/dove-avatar/dove-avatar"
+  },
   "requiredBackgroundModes": ["location"],
   "requiredPrivateInfos": [
     "chooseAddress",

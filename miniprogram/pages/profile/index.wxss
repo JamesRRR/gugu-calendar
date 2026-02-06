@@ -66,6 +66,19 @@
   border: none;
 }
 
+/* 鸽子头像区域 */
+.dove-section {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  margin-bottom: 30rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4rpx 16rpx rgba(255, 182, 193, 0.2);
+  border: 2rpx solid #ffe4e6;
+}
+
 .stats-container {
   margin-bottom: 30rpx;
 }
@@ -164,4 +177,4 @@
 .menu-content {
   display: flex;
   flex-direction: column;
-} 
+}

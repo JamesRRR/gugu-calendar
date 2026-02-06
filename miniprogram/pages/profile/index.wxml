@@ -25,6 +25,14 @@
     </view>
   </view>
 
+  <!-- 鸽子头像 -->
+  <view class="dove-section" wx:if="{{hasUserInfo}}">
+    <dove-avatar 
+      guguRate="{{guguRate}}" 
+      showStatus="{{true}}"
+    />
+  </view>
+
   <!-- 统计数据 -->
   <view class="stats-container">
     <view class="stats-card">
@@ -48,6 +56,11 @@
 
   <!-- 功能按钮 -->
   <view class="action-list">
+    <view class="action-item" bindtap="goToLeaderboard">
+      <text class="icon">🏆</text>
+      <text class="text">咕咕排行榜</text>
+      <text class="arrow">❯</text>
+    </view>
     <view class="action-item" bindtap="buyRegretPoints">
       <text class="icon">💰</text>
       <text class="text">购买点数</text>
@@ -64,4 +77,4 @@
       <text class="arrow">❯</text>
     </view>
   </view>
-</view> 
+</view>
