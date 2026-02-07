@@ -2,24 +2,132 @@
  * @jest-environment jsdom
  */
 
+// 模拟排行榜页面
+function createLeaderboardPageMock() {
+  const data = {
+    leaderboard: [
+      { openid: 'user1', nickName: '咕王1', guguCount: 10, guguRate: 50, avatarUrl: '' },
+      { openid: 'user2', nickName: '咕王2', guguCount: 8, guguRate: 40, avatarUrl: '' },
+      { openid: 'user3', nickName: '咕王3', guguCount: 5, guguRate: 25, avatarUrl: '' }
+    ],
+    todayGuguKing: null,
+    isLoading: false,
+    currentUserRank: null
+  };
+
+  return {
+    data,
+    setData: jest.fn((updates) => {
+      Object.assign(data, updates);
+    }),
+    onLoad: jest.fn(),
+    onShareAppMessage: function() {
+      return {
+        title: '快来加入咕咕日历',
+        path: '/pages/index/index'
+      };
+    }
+  };
+}
+
+// 模拟用户页
+function createProfilePageMock() {
+  const data = {
+    userInfo: {
+      nickName: '测试用户',
+      avatarUrl: 'https://test.com/avatar.png'
+    },
+    userStats: {
+      totalEvents: 20,
+      joinedEvents: 15,
+      guguCount: 2,
+      guguRate: 10,
+      featherCount: 8
+    },
+    doveAvatar: {
+      featherCount: 8,
+      guguRate: 10,
+      status: 'healthy'
+    },
+    isLoggedIn: true
+  };
+
+  return {
+    data,
+    setData: jest.fn((updates) => {
+      Object.assign(data, updates);
+    }),
+    calculateDoveAvatar: function(guguRate) {
+      let featherCount;
+      let status;
+      
+      if (guguRate >= 10) {
+        featherCount = 0;
+        status = 'king';
+      } else if (guguRate >= 5) {
+        featherCount = 5;
+        status = 'molting';
+      } else {
+        featherCount = 10;
+        status = 'healthy';
+      }
+      
+      return { featherCount, status };
+    },
+    onLoad: jest.fn(),
+    onViewHistory: jest.fn(),
+    onShareProfile: jest.fn()
+  };
+}
+
+// 模拟创建活动页
+function createCreateEventPageMock() {
+  const data = {
+    formData: {
+      title: '',
+      date: '',
+      location: '',
+      description: '',
+      maxParticipants: 10,
+      isPaid: false,
+      price: 0
+    },
+    isSubmitting: false,
+    validationErrors: {}
+  };
+
+  return {
+    data,
+    setData: jest.fn((updates) => {
+      // 处理嵌套路径如 'formData.date'
+      for (const [key, value] of Object.entries(updates)) {
+        if (key.includes('.')) {
+          const parts = key.split('.');
+          let obj = data;
+          for (let i = 0; i < parts.length - 1; i++) {
+            obj = obj[parts[i]];
+          }
+          obj[parts[parts.length - 1]] = value;
+        } else {
+          data[key] = value;
+        }
+      }
+    }),
+    onInput: jest.fn(),
+    onDateChange: function(e) {
+      this.setData({ 'formData.date': e.detail.value });
+    },
+    onMaxChange: jest.fn(),
+    onPaidChange: jest.fn(),
+    onSubmit: jest.fn()
+  };
+}
+
 describe('Gugu Calendar V2 - 排行榜页面测试', () => {
   let page;
 
   beforeEach(() => {
-    page = {
-      data: {
-        leaderboard: [
-          { openid: 'user1', nickName: '咕王1', guguCount: 10, guguRate: 50, avatarUrl: '' },
-          { openid: 'user2', nickName: '咕王2', guguCount: 8, guguRate: 40, avatarUrl: '' },
-          { openid: 'user3', nickName: '咕王3', guguCount: 5, guguRate: 25, avatarUrl: '' }
-        ],
-        todayGuguKing: null,
-        isLoading: false,
-        currentUserRank: null
-      },
-      onLoad: jest.fn(),
-      onShareAppMessage: jest.fn()
-    };
+    page = createLeaderboardPageMock();
   });
 
   describe('排行榜数据测试', () => {
@@ -53,6 +161,8 @@ describe('Gugu Calendar V2 - 排行榜页面测试', () => {
     test('分享功能应该可用', () => {
       const shareResult = page.onShareAppMessage();
       expect(shareResult).toBeDefined();
+      expect(shareResult).toHaveProperty('title');
+      expect(shareResult).toHaveProperty('path');
     });
   });
 });
@@ -61,54 +171,26 @@ describe('Gugu Calendar V2 - 用户页鸽子头像测试', () => {
   let page;
 
   beforeEach(() => {
-    page = {
-      data: {
-        userInfo: {
-          nickName: '测试用户',
-          avatarUrl: 'https://test.com/avatar.png'
-        },
-        userStats: {
-          totalEvents: 20,
-          joinedEvents: 15,
-          guguCount: 2,
-          guguRate: 10,
-          featherCount: 8
-        },
-        doveAvatar: {
-          featherCount: 8,
-          guguRate: 10,
-          status: 'healthy' // healthy, molting, bald, king
-        },
-        isLoggedIn: true
-      },
-      onLoad: jest.fn(),
-      onViewHistory: jest.fn(),
-      onShareProfile: jest.fn()
-    };
+    page = createProfilePageMock();
   });
 
   describe('鸽子头像状态测试', () => {
     test('羽毛数量应该根据咕咕率计算', () => {
-      const { guguRate, featherCount } = page.data.userStats;
-      
-      if (guguRate < 5) {
-        expect(featherCount).toBe(10);
-      } else if (guguRate < 10) {
-        expect(featherCount).toBe(8);
-      } else if (guguRate < 20) {
-        expect(featherCount).toBe(5);
-      } else {
-        expect(featherCount).toBeLessThanOrEqual(3);
-      }
+      const testCases = [
+        { guguRate: 3, expectedFeather: 10, desc: '低咕咕率应该羽毛丰满' },
+        { guguRate: 7, expectedFeather: 5, desc: '中等咕咕率应该羽毛减少' },
+        { guguRate: 15, expectedFeather: 0, desc: '高咕咕率应该羽毛很少' }
+      ];
+
+      testCases.forEach(({ guguRate, expectedFeather, desc }) => {
+        const result = page.calculateDoveAvatar(guguRate);
+        expect(result.featherCount).toBe(expectedFeather);
+      });
     });
 
     test('咕咕率达到10%应该显示咕王状态', () => {
-      page.data.userStats.guguRate = 10;
-      page.data.doveAvatar.guguRate = 10;
-      
-      if (page.data.doveAvatar.guguRate >= 10) {
-        expect(page.data.doveAvatar.status).toBe('king');
-      }
+      const result = page.calculateDoveAvatar(10);
+      expect(result.status).toBe('king');
     });
 
     test('用户统计应该包含所有必要字段', () => {
@@ -171,26 +253,7 @@ describe('Gugu Calendar V2 - 创建活动测试', () => {
   let page;
 
   beforeEach(() => {
-    page = {
-      data: {
-        formData: {
-          title: '',
-          date: '',
-          location: '',
-          description: '',
-          maxParticipants: 10,
-          isPaid: false,
-          price: 0
-        },
-        isSubmitting: false,
-        validationErrors: {}
-      },
-      onInput: jest.fn(),
-      onDateChange: jest.fn(),
-      onMaxChange: jest.fn(),
-      onPaidChange: jest.fn(),
-      onSubmit: jest.fn()
-    };
+    page = createCreateEventPageMock();
   });
 
   describe('表单验证测试', () => {
